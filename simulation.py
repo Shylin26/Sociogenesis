@@ -6,6 +6,8 @@ from shared_memory import SharedMemory
 from communication_bus import CommunicationBus
 from task_queue import TaskQueue
 from agent import BaseAgent
+from metrics import WealthMetrics
+
 async def main():
     n_agents=10
     max_ticks=1000
@@ -25,7 +27,17 @@ async def main():
     await asyncio.gather(*agent_tasks)
     
     print("\n--- Simulation Over ---")
-    print("Final Economy Check (Did wealth diverge?):")
+    metrics = WealthMetrics.get_summary(economy.balances)
+    print("\nEconomy Analysis:")
+    print(f"Total Wealth: {metrics['total_wealth']}")
+    print(f"Mean Balance: {metrics['mean']:.2f}")
+    print(f"Median Balance: {metrics['median']:.2f}")
+    print(f"Standard Deviation: {metrics['std_dev']:.2f}")
+    print(f"Max Balance: {metrics['max']}")
+    print(f"Min Balance: {metrics['min']}")
+    print(f"Gini Coefficient: {metrics['gini']:.4f}")
+    
+    print("\nFinal Agent Balances:")
     for i in range(n_agents):
         print(f"Agent {i:02d}: {economy.balances[i]} tokens")
 
