@@ -150,7 +150,7 @@ class AgentTransformer(nn.Module):
         return sum(p.numel() for p in self.parameters())
     
     @torch.no_grad()
-    def generate(self,idx:torch.Tensor,max_new_tokens: int = 64,
+    def generate(self,idx:torch.Tensor,tok_types:torch.Tensor,max_new_tokens: int = 64,
                  temperature: float = 1.0) -> torch.Tensor:
         self.eval()
         for _ in range(max_new_tokens):
