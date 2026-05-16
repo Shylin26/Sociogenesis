@@ -1,12 +1,13 @@
 import torch
 from dataclasses import dataclass, field
+from typing import Optional
 @dataclass
 class AgentRecord:
     agent_id:int
     skill_fingerprint:torch.Tensor
     reputation_score:float=0.0
     token_balance:int=100
-    parent_id: int | None = None
+    parent_id: Optional[int] = None
     birth_tick:int=0
     task_completed:int=0
 class AgentRegistry:
