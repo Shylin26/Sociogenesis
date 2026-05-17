@@ -129,7 +129,7 @@ class Week3Society:
 
         self.engine = SpeciationEngine(
             n_agents    = n_agents,
-            alpha_scale = 0.05,
+            alpha_scale = 0.15,
             top_n       = 3,
             seed        = seed,
         )
@@ -193,14 +193,13 @@ class Week3Society:
             if popped is None:
                 continue
 
-            best_agent = self.engine.route_task(
-                popped.description,
-                popped.task_type.value,
-                living,
+            tt_val     = popped.task_type.value
+            best_agent = self.engine.route_task_by_seed(
+                task_type     = tt_val,
+                living_agents = living,
             )
             popped.assigned_agent = best_agent
 
-            tt_val  = popped.task_type.value
             agent   = self.agents[best_agent]
             correct = agent.bias[tt_val] > 0.5
             self._routing_correct.append(correct)

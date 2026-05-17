@@ -153,6 +153,26 @@ class SpeciationEngine:
         if norm > 1e-8:
             self._attractors[task_type] = blended / norm
 
+    def route_task_by_seed(self, task_type: str,
+                           living_agents: list[int]) -> int:
+        """Route using the fixed type seed directly.
+        More reliable than encoder before fingerprints have converged.
+        After tick ~200, fingerprints and seeds align anyway.
+        """
+        if not living_agents:
+            return 0
+        seed = self._type_seeds.get(task_type)
+        if seed is None:
+            return living_agents[0]
+        best_id, best_score = living_agents[0], -999.0
+        for aid in living_agents:
+            fp    = self.records[aid].fingerprint
+            score = torch.dot(seed, fp).item()
+            if score > best_score:
+                best_score, best_id = score, aid
+        self.total_routes += 1
+        return best_id
+
     def route_task(self, task_description: str,
                    task_type       : str,
                    living_agents   : list[int]) -> int:
