@@ -1,6 +1,6 @@
-from memory.episodic import EpisodicMemory, EpisodicRecord, DIM
+from memory.episodic     import EpisodicMemory, EpisodicRecord, DIM
 from memory.distillation import KnowledgeDistiller, SemanticNode
-from memory.librarian import (
+from memory.librarian    import (
     LibrarianAgent,
     DistillationReport,
     BaseCoherenceScorer,
@@ -9,7 +9,7 @@ from memory.librarian import (
     LlamaCppCoherenceScorer,
     build_scorer,
 )
- 
+
 __all__ = [
     "EpisodicMemory",
     "EpisodicRecord",
@@ -24,4 +24,3 @@ __all__ = [
     "LlamaCppCoherenceScorer",
     "build_scorer",
 ]
- 
