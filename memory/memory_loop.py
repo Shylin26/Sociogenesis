@@ -77,10 +77,13 @@ def _task_emb(task_desc: str) -> np.ndarray:
 
 
 def _art_emb(content: str) -> np.ndarray:
-    vec = np.zeros(128, dtype=np.float32)
+    rng = np.random.RandomState(hash(content[:256]) % (2**31))
+    base = np.zeros(128, dtype=np.float32)
     for i, ch in enumerate(content[:512]):
-        vec[ord(ch) % 128] += 1.0 / (i + 1)
-    n = np.linalg.norm(vec)
+        base[ord(ch) % 128] += 1.0 / (i + 1)
+    noise = rng.randn(128).astype(np.float32) * 0.3
+    vec   = base + noise
+    n     = np.linalg.norm(vec)
     return vec / n if n > 1e-8 else vec
 
 
