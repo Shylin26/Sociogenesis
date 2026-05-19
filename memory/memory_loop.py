@@ -44,7 +44,7 @@ TASK_BANK = [
 
 COALITION_DIFFICULTY_THRESHOLD = 0.75
 TASK_TYPES                     = ["code", "research", "visual"]
-RAG_REPEAT_INTERVAL            = 40
+RAG_REPEAT_INTERVAL            = 50
 
 
 def _build_fingerprints(engine):
@@ -112,6 +112,7 @@ def run(n_agents=10, max_ticks=200, seed=42):
 
     baseline_quality = {t: [] for t in TASK_TYPES}
     rag_quality      = {t: [] for t in TASK_TYPES}
+    repeat_counts    = {t: 0  for t in TASK_TYPES}
 
     stats = {
         "code": 0, "research": 0, "visual": 0,
@@ -256,7 +257,8 @@ def run(n_agents=10, max_ticks=200, seed=42):
                     )
 
                 if is_repeat:
-                    if len(baseline_quality[repeat_type]) < 3:
+                    repeat_counts[repeat_type] += 1
+                    if repeat_counts[repeat_type] == 1:
                         baseline_quality[repeat_type].append(final_quality)
                     else:
                         rag_quality[repeat_type].append(final_quality)
@@ -337,7 +339,8 @@ def run(n_agents=10, max_ticks=200, seed=42):
             )
 
             if is_repeat:
-                if len(baseline_quality[repeat_type]) < 3:
+                repeat_counts[repeat_type] += 1
+                if repeat_counts[repeat_type] == 1:
                     baseline_quality[repeat_type].append(quality)
                 else:
                     rag_quality[repeat_type].append(quality)
@@ -399,4 +402,4 @@ def run(n_agents=10, max_ticks=200, seed=42):
 
 
 if __name__ == "__main__":
-    run(n_agents=10, max_ticks=200, seed=42)
+    run(n_agents=10, max_ticks=400, seed=42)
