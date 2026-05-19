@@ -249,10 +249,20 @@ class ResearchOutputLayer:
                 task_desc     : str,
                 tick          : int,
                 coalition_id  : Optional[str] = None,
-                custom_hyp    : Optional[dict] = None) -> ResearchArtifact:
+                custom_hyp    : Optional[dict] = None,
+                difficulty    : float = 0.5) -> ResearchArtifact:
         hypothesis = custom_hyp or self.select_template(task_desc)
         raw_text   = json.dumps(hypothesis, indent=2)
-        quality    = self.scorer.score(hypothesis)
+        base_score = self.scorer.score(hypothesis)
+
+        import random
+        if difficulty < 0.4:
+            quality = base_score * random.uniform(0.5, 0.75)
+        elif difficulty < 0.75:
+            quality = base_score * random.uniform(0.75, 0.95)
+        else:
+            quality = base_score
+        quality = round(min(1.0, quality), 3)
  
         artifact = ResearchArtifact(
             artifact_id   = str(uuid.uuid4()),

@@ -279,27 +279,36 @@ class VisualOutputLayer:
                 tick          : int,
                 coalition_id  : Optional[str] = None,
                 context       : Optional[dict] = None,
-                template_key  : Optional[str]  = None) -> VisualArtifact:
+                template_key  : Optional[str]  = None,
+                difficulty    : float = 0.5) -> VisualArtifact:
         key      = template_key or self.select_template(task_desc)
         template = VISUAL_TEMPLATES.get(key, VISUAL_TEMPLATES["data_flow"])
         ctx      = context or {}
- 
+
         prompt       = template["prompt"]
         style_vector = template["style_vector"]
- 
+
         if self.mode == "sdxl":
             content = self._generate_sdxl(prompt)
         elif self.mode == "ascii":
             content = template["generator"](ctx)
-        else:  # stub
+        else:
             content = (
                 f"[VISUAL STUB]\n"
                 f"prompt: {prompt[:80]}\n"
                 f"style:  {style_vector}\n"
                 f"task:   {task_desc[:80]}\n"
             )
- 
-        quality = self.scorer.score(prompt, content)
+
+        import random
+        base_quality = self.scorer.score(prompt, content)
+        if difficulty < 0.4:
+            quality = base_quality * random.uniform(0.4, 0.65)
+        elif difficulty < 0.75:
+            quality = base_quality * random.uniform(0.65, 0.90)
+        else:
+            quality = base_quality
+        quality = round(min(1.0, max(0.1, quality)), 3)
  
         artifact = VisualArtifact(
             artifact_id   = str(uuid.uuid4()),

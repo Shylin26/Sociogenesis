@@ -132,6 +132,7 @@ def run(n_agents=10, max_ticks=100, seed=42):
                     tick         = tick,
                     fingerprints = fingerprints,
                     type_seeds   = type_seeds,
+                    difficulty   = difficulty,
                 )
 
                 type_map = {
@@ -222,19 +223,22 @@ def run(n_agents=10, max_ticks=100, seed=42):
 
             if task_type == "code":
                 art     = router.code_layer.produce(agent_id=best_agent,
-                                                    task_desc=task_desc, tick=tick)
+                                                    task_desc=task_desc, tick=tick,
+                                                    difficulty=difficulty)
                 content = art.code
                 quality = art.quality_score
                 atype   = ArtifactType.CODE
             elif task_type == "research":
                 art     = router.research_layer.produce(agent_id=best_agent,
-                                                        task_desc=task_desc, tick=tick)
+                                                        task_desc=task_desc, tick=tick,
+                                                        difficulty=difficulty)
                 content = art.raw_text
                 quality = art.quality_score
                 atype   = ArtifactType.RESEARCH
             else:
                 art     = router.visual_layer.produce(agent_id=best_agent,
-                                                      task_desc=task_desc, tick=tick)
+                                                      task_desc=task_desc, tick=tick,
+                                                      difficulty=difficulty)
                 content = art.content
                 quality = art.quality_score
                 atype   = ArtifactType.VISUAL

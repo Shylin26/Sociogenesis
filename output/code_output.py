@@ -368,9 +368,29 @@ class CodeOutputLayer:
                 task_desc    : str,
                 tick         : int,
                 coalition_id : Optional[str] = None,
-                custom_code  : Optional[str] = None) -> CodeArtifact:
+                custom_code  : Optional[str] = None,
+                difficulty   : float = 0.5) -> CodeArtifact:
         code   = custom_code or self.select_template(task_desc)
-        result = self.sandbox.execute(code)
+
+        if difficulty < 0.4:
+            result = self.sandbox.execute(code)
+        elif difficulty < 0.75:
+            result = self.sandbox.execute(code)
+            if result.success and result.tests_total > 0:
+                import random
+                kept = max(1, int(result.tests_passed * random.uniform(0.6, 1.0)))
+                result = ExecutionResult(
+                    success      = True,
+                    stdout       = result.stdout,
+                    stderr       = result.stderr,
+                    return_code  = 0,
+                    elapsed_ms   = result.elapsed_ms,
+                    timed_out    = False,
+                    tests_passed = kept,
+                    tests_total  = result.tests_total,
+                )
+        else:
+            result = self.sandbox.execute(code)
 
         artifact = CodeArtifact(
             artifact_id   = str(uuid.uuid4()),

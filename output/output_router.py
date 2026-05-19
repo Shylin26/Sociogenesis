@@ -66,7 +66,8 @@ class OutputRouter:
                           task_desc    : str,
                           tick         : int,
                           fingerprints : dict[int, torch.Tensor],
-                          type_seeds   : dict[str, torch.Tensor]) -> RoutedOutput:
+                          type_seeds   : dict[str, torch.Tensor],
+                          difficulty   : float = 0.5) -> RoutedOutput:
         assignments = self._assign_types(
             coalition, fingerprints, type_seeds
         )
@@ -92,21 +93,21 @@ class OutputRouter:
             if output_type == "code":
                 art = self._produce_code(
                     agent_id, task_desc, tick,
-                    coalition.coalition_id, context
+                    coalition.coalition_id, context, difficulty
                 )
                 output.code_artifact = art
- 
+
             elif output_type == "research":
                 art = self._produce_research(
                     agent_id, task_desc, tick,
-                    coalition.coalition_id, context
+                    coalition.coalition_id, context, difficulty
                 )
                 output.research_artifact = art
- 
+
             elif output_type == "visual":
                 art = self._produce_visual(
                     agent_id, task_desc, tick,
-                    coalition.coalition_id, context
+                    coalition.coalition_id, context, difficulty
                 )
                 output.visual_artifact = art
  
@@ -150,13 +151,13 @@ class OutputRouter:
     
     def _produce_code(self, agent_id: int, task_desc: str,
                       tick: int, coalition_id: str,
-                      context: dict) -> CodeArtifact:
-        """Produce code artifact and write fn names to context."""
+                      context: dict, difficulty: float = 0.5) -> CodeArtifact:
         art = self.code_layer.produce(
             agent_id     = agent_id,
             task_desc    = task_desc,
             tick         = tick,
             coalition_id = coalition_id,
+            difficulty   = difficulty,
         )
  
         import re
@@ -169,20 +170,20 @@ class OutputRouter:
     
     def _produce_research(self, agent_id: int, task_desc: str,
                            tick: int, coalition_id: str,
-                           context: dict) -> ResearchArtifact:
-
+                           context: dict, difficulty: float = 0.5) -> ResearchArtifact:
         enriched_desc = task_desc
         if context.get("code_fn_name"):
             enriched_desc = (
                 f"{task_desc} "
                 f"(code function: {context['code_fn_name']})"
             )
- 
+
         art = self.research_layer.produce(
             agent_id     = agent_id,
             task_desc    = enriched_desc,
             tick         = tick,
             coalition_id = coalition_id,
+            difficulty   = difficulty,
         )
 
         context["research_claim"] = art.claim[:60]
@@ -190,8 +191,7 @@ class OutputRouter:
     
     def _produce_visual(self, agent_id: int, task_desc: str,
                          tick: int, coalition_id: str,
-                         context: dict) -> VisualArtifact:
-        
+                         context: dict, difficulty: float = 0.5) -> VisualArtifact:
         visual_context = {
             "title": context.get("title", "System Architecture"),
         }
@@ -205,13 +205,14 @@ class OutputRouter:
                 "Topic Classifier",
                 "Output Chart",
             ]
- 
+
         art = self.visual_layer.produce(
             agent_id     = agent_id,
             task_desc    = task_desc,
             tick         = tick,
             coalition_id = coalition_id,
             context      = visual_context,
+            difficulty   = difficulty,
         )
         return art
 
