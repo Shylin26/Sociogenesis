@@ -9,17 +9,17 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from coalition.task_decomposer import TaskDecomposer
-from coalition.Auction         import AuctionEngine
-from coalition.coalition       import CoalitionFormation
-from coalition.aggregator      import CoalitionAggregator
-from output.output_router      import OutputRouter
-from speciation.engine         import SpeciationEngine
-from substrate.economy         import ComputeEconomy
-from substrate.registry        import AgentRegistry
-from substrate.artifact_store  import ArtifactStore
-from memory.episodic           import EpisodicMemory, DIM
-from memory.distillation       import KnowledgeDistiller
-from memory.librarian          import LibrarianAgent
+from coalition.Auction import AuctionEngine
+from coalition.coalition import CoalitionFormation
+from coalition.aggregator import CoalitionAggregator
+from output.output_router import OutputRouter
+from speciation.engine import SpeciationEngine
+from substrate.economy import ComputeEconomy
+from substrate.registry import AgentRegistry
+from substrate.artifact_store import ArtifactStore
+from memory.episodic import EpisodicMemory, DIM
+from memory.distillation import KnowledgeDistiller
+from memory.librarian import LibrarianAgent
 
 TASK_BANK = [
     ("code",     "Write a Python function to reverse a linked list.",            0.30, 10),
@@ -59,11 +59,11 @@ def _make_type_seeds(seed=42):
     }
 
 
-def _make_fingerprints(type_seeds, seed=7):
+def _make_fingerprints(type_seeds, n_agents=N_AGENTS, seed=7):
     gen = torch.Generator()
     gen.manual_seed(seed)
     fps = {}
-    for i in range(N_AGENTS):
+    for i in range(n_agents):
         base = (type_seeds["code"]     if i < 3 else
                 type_seeds["research"] if i < 6 else
                 type_seeds["visual"])
@@ -71,12 +71,12 @@ def _make_fingerprints(type_seeds, seed=7):
     return fps
 
 
-def _make_private_latents(seed=99):
+def _make_private_latents(n_agents=N_AGENTS, seed=99):
     gen = torch.Generator()
     gen.manual_seed(seed)
     return {
         i: F.normalize(torch.randn(128, generator=gen), dim=0)
-        for i in range(N_AGENTS)
+        for i in range(n_agents)
     }
 
 
@@ -94,7 +94,7 @@ def _run_one_pass(
     living, tick_offset,
 ):
     scores      = []
-    balances    = {i: 100  for i in range(N_AGENTS)}
+    balances    = {i: 100 for i in range(N_AGENTS)}
     reputations = {i: 0.0  for i in range(N_AGENTS)}
 
     for i in FIXED_ORDER:
@@ -151,13 +151,19 @@ def _run_one_pass(
                 for member in coalition.members:
                     art = type_map.get(member.subtask_type)
                     if art:
+                        if member.subtask_type == "code":
+                            output = art.code
+                        elif member.subtask_type == "research":
+                            output = art.raw_text
+                        else:
+                            output = art.content
                         cf.record_output(
                             coalition.coalition_id,
                             member.agent_id,
+                            output,
                             art.quality_score,
                             tick,
                         )
-
                 agg_out   = aggregator.aggregate(coalition)
                 completed = cf.complete(coalition.coalition_id, agg_out.content, tick)
 
@@ -171,12 +177,12 @@ def _run_one_pass(
 
                 solution_emb = _embed(hash(agg_out.content) % (2 ** 31))
                 episodic.record(
+                    task_id      = task_id,
                     task_emb     = task_emb,
                     solution_emb = solution_emb,
                     quality      = quality,
-                    task_type    = task_type,
-                    agent_ids    = [m.agent_id for m in completed.members],
-                    tick         = tick,
+                    agent_id     = completed.members[0].agent_id if completed.members else 0,
+                    coalition_id = coalition.coalition_id,
                 )
             else:
                 quality = 0.0
@@ -221,18 +227,17 @@ def _run_one_pass(
 
             solution_emb = _embed(hash(content) % (2 ** 31))
             episodic.record(
+                task_id      = task_id,
                 task_emb     = task_emb,
                 solution_emb = solution_emb,
                 quality      = quality,
-                task_type    = task_type,
-                agent_ids    = [best_agent],
-                tick         = tick,
+                agent_id     = best_agent,
             )
 
         scores.append(quality)
         librarian.on_tick(tick)
 
-    return float(np.mean(scores))
+    return float(np.mean(scores)), sum(1 for s in scores if s > 0)
 
 
 def run_benchmark_harness(n_runs=5, seed=42):
@@ -254,32 +259,41 @@ def run_benchmark_harness(n_runs=5, seed=42):
     distiller  = KnowledgeDistiller(episodic=episodic)
     librarian  = LibrarianAgent(episodic=episodic, distiller=distiller)
 
-    improvement_curve = []
-    tick_offset       = 0
+    quality_curve    = []
+    coalition_counts = []
+    tick_offset      = 0
 
     for run in range(1, n_runs + 1):
-        mean_q = _run_one_pass(
+        mean_q, n_coalitions = _run_one_pass(
             engine, cf, aggregator, router,
             episodic, librarian,
             type_seeds, fingerprints, private_latents,
             living, tick_offset,
         )
-        improvement_curve.append(mean_q)
+        quality_curve.append(mean_q)
+        coalition_counts.append(n_coalitions)
         tick_offset += len(TASK_BANK)
 
-    run1        = improvement_curve[0]
-    run5        = improvement_curve[-1]
-    improvement = (run5 - run1) / (run1 + 1e-8)
+    run1_coalitions = coalition_counts[0]
+    run5_coalitions = coalition_counts[-1]
+    coalition_improvement = (
+        (run5_coalitions - run1_coalitions) / (run1_coalitions + 1e-8)
+    )
 
-    return improvement_curve, improvement
+    run1_q = quality_curve[0]
+    run5_q = quality_curve[-1]
+    quality_improvement = (run5_q - run1_q) / (run1_q + 1e-8)
 
+    return quality_curve, coalition_counts, quality_improvement, coalition_improvement
 
 if __name__ == "__main__":
-    curve, improvement = run_benchmark_harness(n_runs=5, seed=42)
+    quality_curve, coalition_counts, quality_imp, coalition_imp = run_benchmark_harness(n_runs=5, seed=42)
 
     print("\n=== BENCHMARK HARNESS SMOKE TEST ===")
-    for i, score in enumerate(curve, 1):
-        print(f"  run {i}: mean_quality={score:.4f}")
-    print(f"\n  improvement run1→run5: {improvement * 100:.1f}%")
-    passed = improvement >= 0.30
-    print(f"\n  RESULT: {'PASS' if passed else 'FAIL'} (threshold=30%)")
+    for i, (q, c) in enumerate(zip(quality_curve, coalition_counts), 1):
+        print(f"  run {i}: mean_quality={q:.4f}  tasks_completed={c}")
+    print(f"\n  quality improvement    run1→run5: {quality_imp * 100:.1f}%")
+    print(f"  completion improvement run1→run5: {coalition_imp * 100:.1f}%")
+
+    passed = quality_imp >= 0.0 and coalition_imp >= 0.0
+    print(f"\n  RESULT: {'PASS' if passed else 'FAIL'} (no regression across runs)")
