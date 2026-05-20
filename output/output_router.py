@@ -10,7 +10,11 @@ import torch.nn.functional as F
 from output.code_output     import CodeOutputLayer,     CodeArtifact
 from output.research_output import ResearchOutputLayer, ResearchArtifact
 from output.visual_output   import VisualOutputLayer,   VisualArtifact
+from memory.episodic        import EpisodicMemory
+import numpy as np
 
+RAG_BONUS_CAP   = 0.15
+RAG_BONUS_SCALE = 0.20
 @dataclass
 class RoutedOutput:
     coalition_id    : str
@@ -55,11 +59,13 @@ class RoutedOutput:
 class OutputRouter:
     EXECUTION_ORDER = ["code", "research", "visual"]
  
-    def __init__(self, visual_mode: str = "ascii"):
+    def __init__(self, visual_mode: str = "ascii",
+                 episodic: Optional[EpisodicMemory] = None):
         self.code_layer     = CodeOutputLayer(timeout=5)
         self.research_layer = ResearchOutputLayer()
         self.visual_layer   = VisualOutputLayer(mode=visual_mode)
         self.history        : list[RoutedOutput] = []
+        self.episodic       = episodic
  
     def route_and_produce(self,
                           coalition,
@@ -67,10 +73,8 @@ class OutputRouter:
                           tick         : int,
                           fingerprints : dict[int, torch.Tensor],
                           type_seeds   : dict[str, torch.Tensor],
-                          difficulty   : float = 0.5) -> RoutedOutput:
-        assignments = self._assign_types(
-            coalition, fingerprints, type_seeds
-        )
+                          difficulty   : float = 0.5,
+                          task_emb     : Optional[np.ndarray] = None) -> RoutedOutput:
 
         context = {
             "title"            : self._extract_title(task_desc),
@@ -78,7 +82,7 @@ class OutputRouter:
             "code_var_name"    : "",
             "research_claim"   : "",
         }
- 
+        assignments = self._assign_types(coalition, fingerprints, type_seeds)
         output = RoutedOutput(
             coalition_id = coalition.coalition_id,
             task_desc    = task_desc,
@@ -96,23 +100,38 @@ class OutputRouter:
                     coalition.coalition_id, context, difficulty
                 )
                 output.code_artifact = art
-
             elif output_type == "research":
                 art = self._produce_research(
                     agent_id, task_desc, tick,
                     coalition.coalition_id, context, difficulty
                 )
                 output.research_artifact = art
-
             elif output_type == "visual":
                 art = self._produce_visual(
                     agent_id, task_desc, tick,
                     coalition.coalition_id, context, difficulty
                 )
                 output.visual_artifact = art
+
+            if art is not None and task_emb is not None and self.episodic is not None:
+                art.quality_score = self._apply_rag_bonus(art.quality_score, task_emb)
+               
+
  
         self.history.append(output)
         return output
+    
+    def _apply_rag_bonus(self, base_quality: float,
+                         task_emb: np.ndarray) -> float:
+        hits = self.episodic.retrieve(task_emb, k=3)
+        if not hits:
+            return base_quality
+        mean_hit_quality = float(np.mean([
+            getattr(h, "quality", getattr(h, "quality_score", 0.0))
+            for h in hits
+        ]))
+        bonus = min(RAG_BONUS_CAP, mean_hit_quality * RAG_BONUS_SCALE)
+        return min(1.0, base_quality + bonus)
 
     def _assign_types(self, coalition,
                       fingerprints : dict[int, torch.Tensor],
