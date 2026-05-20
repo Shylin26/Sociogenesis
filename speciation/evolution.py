@@ -104,11 +104,12 @@ class EvolutionEngine:
                 current_tick = tick,
                 mutation_rate= self.mutation_rate,
             )
-            self.registry.replace_agent(
-                dead_id,
-                parent_id,
-                current_tick=tick,
-            )
+            if self.registry is not None:
+                self.registry.replace_agent(
+                    dead_id,
+                    parent_id,
+                    current_tick=tick,
+                )
 
             dead_tokens   = balances.get(dead_id, 0)
             parent_tokens = balances.get(parent_id, 0)
