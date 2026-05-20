@@ -140,6 +140,7 @@ def _run_one_pass(
                     fingerprints = fingerprints,
                     type_seeds   = type_seeds,
                     difficulty   = difficulty,
+                    task_emb     = task_emb,
                 )
                 quality = routed.mean_quality
 
@@ -254,10 +255,10 @@ def run_benchmark_harness(n_runs=5, seed=42):
                                   top_n=3, seed=seed)
     cf         = CoalitionFormation()
     aggregator = CoalitionAggregator()
-    router     = OutputRouter(visual_mode="ascii")
     episodic   = EpisodicMemory()
     distiller  = KnowledgeDistiller(episodic=episodic)
     librarian  = LibrarianAgent(episodic=episodic, distiller=distiller)
+    router     = OutputRouter(visual_mode="ascii", episodic=episodic)
 
     quality_curve    = []
     coalition_counts = []
