@@ -323,7 +323,12 @@ async def index():
     html_path = os.path.join(os.path.dirname(__file__), "frontend.html")
     return FileResponse(html_path)
 
-
+@app.get("/paper")
+async def get_paper():
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "artifacts", "pantheon_paper.pdf")
+    if os.path.exists(path):
+        return FileResponse(path, media_type="application/pdf", filename="pantheon_paper.pdf")
+    return {"error": "Paper not generated yet — run week8_loop.py first"}
 @app.get("/snapshot")
 async def get_snapshot():
     return society.snapshot()
