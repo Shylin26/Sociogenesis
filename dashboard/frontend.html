@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTHEON</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg0: #08090a;
+            --bg1: #0f1012;
+            --bg2: #16181c;
+            --bg3: #1e2026;
+            --border: rgba(255, 255, 255, 0.06);
+            --border2: rgba(255, 255, 255, 0.10);
+            --text0: #f0f0f0;
+            --text1: #a0a6b0;
+            --text2: #5a6070;
+            --blue: #4a9eff;
+            --orange: #ff8c42;
+            --green: #42d98a;
+            --purple: #a78bfa;
+            --yellow: #fbbf24;
+            --red: #f87171;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: var(--bg0);
+            color: var(--text0);
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 12px;
+            overflow: hidden;
+        }
+
+        header {
+            height: 48px;
+            background: var(--bg1);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--blue);
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8)
+            }
+        }
+
+        .hstat {
+            display: flex;
+            flex-direction: column;
+            margin-left: 8px;
+        }
+
+        .hstat .v {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text0);
+            line-height: 1;
+        }
+
+        .hstat .l {
+            font-size: 10px;
+            color: var(--text2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+
+        .hsep {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .badge.live {
+            background: rgba(66, 217, 138, 0.15);
+            color: var(--green);
+            border: 1px solid rgba(66, 217, 138, 0.3);
+        }
+
+        .layout {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: grid;
+            grid-template-columns: 1fr 280px 280px;
+            grid-template-rows: 1fr 220px;
+            gap: 1px;
+            background: var(--border);
+        }
+
+        .panel {
+            background: var(--bg1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .panel.span2 {
+            grid-row: span 2;
+        }
+
+        .panel-header {
+            padding: 12px 16px 8px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .panel-title {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text2);
+            font-weight: 600;
+        }
+
+        .panel-graph {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+
+        #graph-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .panel-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            min-height: 0;
+        }
+
+        .panel-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .panel-scroll::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 2px;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .stat-card .sv {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text0);
+            line-height: 1;
+        }
+
+        .stat-card .sl {
+            font-size: 9px;
+            color: var(--text2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .stat-card.blue .sv {
+            color: var(--blue);
+        }
+
+        .stat-card.green .sv {
+            color: var(--green);
+        }
+
+        .stat-card.orange .sv {
+            color: var(--orange);
+        }
+
+        .stat-card.purple .sv {
+            color: var(--purple);
+        }
+
+        .role-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .chip {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .chip.code {
+            background: rgba(74, 158, 255, 0.12);
+            color: var(--blue);
+            border: 1px solid rgba(74, 158, 255, 0.25);
+        }
+
+        .chip.research {
+            background: rgba(255, 140, 66, 0.12);
+            color: var(--orange);
+            border: 1px solid rgba(255, 140, 66, 0.25);
+        }
+
+        .chip.visual {
+            background: rgba(66, 217, 138, 0.12);
+            color: var(--green);
+            border: 1px solid rgba(66, 217, 138, 0.25);
+        }
+
+        .chip.unknown {
+            background: rgba(90, 96, 112, 0.2);
+            color: var(--text1);
+            border: 1px solid var(--border);
+        }
+
+        .bar-agent {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .bar-id {
+            width: 24px;
+            font-size: 10px;
+            color: var(--text2);
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 14px;
+            background: var(--bg2);
+            border-radius: 3px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .bar-val {
+            width: 44px;
+            font-size: 10px;
+            color: var(--text1);
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .artifact-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            background: var(--bg2);
+            border-left: 3px solid var(--border2);
+        }
+
+        .artifact-item.code {
+            border-color: var(--blue);
+        }
+
+        .artifact-item.research {
+            border-color: var(--orange);
+        }
+
+        .artifact-item.visual {
+            border-color: var(--green);
+        }
+
+        .artifact-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 3px;
+        }
+
+        .artifact-type {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .artifact-type.code {
+            color: var(--blue);
+        }
+
+        .artifact-type.research {
+            color: var(--orange);
+        }
+
+        .artifact-type.visual {
+            color: var(--green);
+        }
+
+        .artifact-meta {
+            font-size: 10px;
+            color: var(--text2);
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .mstat {
+            background: var(--bg2);
+            border-radius: 6px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+        }
+
+        .mstat .v {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--purple);
+        }
+
+        .mstat .l {
+            font-size: 9px;
+            color: var(--text2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .coal-item {
+            padding: 6px 10px;
+            background: var(--bg2);
+            border-radius: 6px;
+            margin-bottom: 4px;
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .coal-id {
+            font-size: 10px;
+            color: var(--purple);
+            font-weight: 700;
+        }
+
+        .coal-meta {
+            font-size: 10px;
+            color: var(--text2);
+            margin-top: 2px;
+        }
+
+        .no-coal {
+            font-size: 11px;
+            color: var(--text2);
+            font-style: italic;
+        }
+
+        .loss-bar {
+            height: 4px;
+            background: var(--bg2);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .loss-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: var(--purple);
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="pulse"></div>
+        <div class="logo">PANTHEON</div>
+        <div class="hsep"></div>
+        <div class="hstat">
+            <div class="v" id="h-tick">—</div>
+            <div class="l">tick</div>
+        </div>
+        <div class="hsep"></div>
+        <div class="hstat">
+            <div class="v" id="h-quality">—</div>
+            <div class="l">avg quality</div>
+        </div>
+        <div class="hsep"></div>
+        <div class="hstat">
+            <div class="v" id="h-ep">—</div>
+            <div class="l">episodic</div>
+        </div>
+        <div class="hsep"></div>
+        <div class="hstat">
+            <div class="v" id="h-nodes">—</div>
+            <div class="l">semantic nodes</div>
+        </div>
+        <div style="margin-left:auto;"><span class="badge live">LIVE</span></div>
+    </header>
+
+    <div class="layout">
+
+        <div class="panel span2">
+            <div class="panel-header">
+                <div class="panel-title">Agent Society</div>
+                <div id="graph-coalition-label" style="margin-left:auto;font-size:10px;color:var(--purple);"></div>
+            </div>
+            <div class="panel-graph">
+                <svg id="graph-svg"></svg>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Society Stats</div>
+            </div>
+            <div class="panel-scroll">
+                <div class="stat-row">
+                    <div class="stat-card blue">
+                        <div class="sv" id="s-tick">0</div>
+                        <div class="sl">tick</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="sv" id="s-ep">0</div>
+                        <div class="sl">episodic</div>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-card orange">
+                        <div class="sv" id="s-nodes">0</div>
+                        <div class="sl">sem. nodes</div>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="sv" id="s-coal">0</div>
+                        <div class="sl">coalitions</div>
+                    </div>
+                </div>
+                <div
+                    style="margin-top:12px;font-size:9px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">
+                    Role clusters</div>
+                <div class="role-chips" id="role-chips"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Society Model</div>
+            </div>
+            <div class="panel-scroll">
+                <div class="model-grid" id="model-stats"></div>
+                <div class="loss-bar">
+                    <div class="loss-fill" id="loss-fill" style="width:0%"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                    <span style="font-size:9px;color:var(--text2);">loss</span>
+                    <span id="loss-val" style="font-size:9px;color:var(--purple);">—</span>
+                </div>
+                <div
+                    style="margin-top:12px;font-size:9px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">
+                    Active coalitions</div>
+                <div id="coalitions"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Token Economy</div>
+            </div>
+            <div class="panel-scroll" id="economy-bars"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Artifact Feed</div>
+            </div>
+            <div class="panel-scroll" id="artifact-feed"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const ROLE_COLOR = { code: '#4a9eff', research: '#ff8c42', visual: '#42d98a', unknown: '#5a6070' };
+        let sim, svgEl, linkSel, nodeSel;
+        let nodes = [], links = [];
+        let qualityHistory = [];
+
+        function getGraphDims() {
+            const el = document.getElementById('graph-svg');
+            const r = el.getBoundingClientRect();
+            return { w: r.width || 600, h: r.height || 400 };
+        }
+
+        function initGraph() {
+            svgEl = d3.select('#graph-svg');
+            const { w, h } = getGraphDims();
+
+            sim = d3.forceSimulation()
+                .force('link', d3.forceLink().id(d => d.id).distance(80).strength(0.4))
+                .force('charge', d3.forceManyBody().strength(-200))
+                .force('center', d3.forceCenter(w / 2, h / 2))
+                .force('collision', d3.forceCollide().radius(d => d.r + 8))
+                .force('bounds', () => {
+                    nodes.forEach(d => {
+                        d.x = Math.max(d.r + 10, Math.min(w - d.r - 10, d.x));
+                        d.y = Math.max(d.r + 10, Math.min(h - d.r - 10, d.y));
+                    });
+                });
+
+            linkSel = svgEl.append('g').attr('class', 'links');
+            nodeSel = svgEl.append('g').attr('class', 'nodes');
+        }
+
+        function updateGraph(data) {
+            const { w, h } = getGraphDims();
+
+            sim.force('center', d3.forceCenter(w / 2, h / 2));
+
+            const prevPos = {};
+            nodes.forEach(n => { prevPos[n.id] = { x: n.x, y: n.y, vx: n.vx || 0, vy: n.vy || 0 }; });
+
+            nodes = data.agents.map(a => {
+                const p = prevPos[a.id] || {
+                    x: w / 2 + (Math.random() - 0.5) * 120,
+                    y: h / 2 + (Math.random() - 0.5) * 120,
+                    vx: 0, vy: 0
+                };
+                return {
+                    id: a.id, role: a.role, rep: a.reputation, tok: a.tokens,
+                    r: Math.max(12, Math.min(28, 12 + a.reputation * 20)),
+                    x: p.x, y: p.y, vx: p.vx, vy: p.vy
+                };
+            });
+
+            links = [];
+            data.active_coalitions.forEach(c => {
+                const m = c.members || [];
+                for (let i = 0; i < m.length - 1; i++)
+                    links.push({ source: m[i], target: m[i + 1] });
+            });
+
+            linkSel.selectAll('line').data(links, d => `${d.source}-${d.target}`)
+                .join(
+                    e => e.append('line').attr('stroke', 'rgba(167,139,250,0.4)')
+                        .attr('stroke-width', 2).attr('stroke-dasharray', '5,3'),
+                    u => u,
+                    x => x.remove()
+                );
+
+            const ng = nodeSel.selectAll('g.agent').data(nodes, d => d.id)
+                .join(
+                    enter => {
+                        const g = enter.append('g').attr('class', 'agent').style('cursor', 'pointer');
+                        g.append('circle').attr('class', 'ring').attr('fill', 'none')
+                            .attr('stroke-width', 1.5).attr('stroke-dasharray', '3,3').attr('opacity', 0.3);
+                        g.append('circle').attr('class', 'body');
+                        g.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em')
+                            .attr('fill', 'rgba(255,255,255,0.95)').style('pointer-events', 'none')
+                            .style('font-family', 'monospace').style('font-weight', '700').style('font-size', '10px');
+                        return g;
+                    },
+                    u => u, x => x.remove()
+                );
+
+            ng.select('circle.ring')
+                .attr('r', d => d.r + 6)
+                .attr('stroke', d => ROLE_COLOR[d.role] || '#5a6070')
+                .attr('opacity', d => d.rep > 0.5 ? 0.45 : 0.15);
+
+            ng.select('circle.body')
+                .attr('r', d => d.r)
+                .attr('fill', d => ROLE_COLOR[d.role] || '#5a6070')
+                .attr('fill-opacity', 0.88)
+                .attr('stroke', d => ROLE_COLOR[d.role] || '#5a6070')
+                .attr('stroke-width', 1.5).attr('stroke-opacity', 0.5);
+
+            ng.select('text').text(d => `A${d.id}`);
+
+            ng.call(d3.drag()
+                .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+                .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+                .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+            );
+
+            sim.nodes(nodes).on('tick', () => {
+                linkSel.selectAll('line')
+                    .attr('x1', d => typeof d.source === 'object' ? d.source.x : 0)
+                    .attr('y1', d => typeof d.source === 'object' ? d.source.y : 0)
+                    .attr('x2', d => typeof d.target === 'object' ? d.target.x : 0)
+                    .attr('y2', d => typeof d.target === 'object' ? d.target.y : 0);
+                nodeSel.selectAll('g.agent').attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+            sim.force('link').links(links);
+            sim.alpha(0.2).restart();
+
+            const coal = data.active_coalitions;
+            document.getElementById('graph-coalition-label').textContent =
+                coal.length ? `${coal.length} coalition${coal.length > 1 ? 's' : ''} active` : '';
+        }
+
+        function updateHeader(data) {
+            document.getElementById('h-tick').textContent = data.tick;
+            document.getElementById('h-ep').textContent = data.episodic_count;
+            document.getElementById('h-nodes').textContent = data.semantic_nodes;
+            if (qualityHistory.length > 0) {
+                const avg = qualityHistory.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, qualityHistory.length);
+                document.getElementById('h-quality').textContent = avg.toFixed(3);
+            }
+        }
+
+        function updateStats(data) {
+            document.getElementById('s-tick').textContent = data.tick;
+            document.getElementById('s-ep').textContent = data.episodic_count;
+            document.getElementById('s-nodes').textContent = data.semantic_nodes;
+            document.getElementById('s-coal').textContent = data.active_coalitions.length;
+            const roles = data.roles || {};
+            document.getElementById('role-chips').innerHTML = Object.entries(roles)
+                .map(([r, c]) => `<div class="chip ${r}">${r} <span style="opacity:0.6">${c}</span></div>`).join('');
+        }
+
+        function updateEconomy(data) {
+            const maxTok = Math.max(...data.agents.map(a => a.tokens), 1);
+            document.getElementById('economy-bars').innerHTML = data.agents.map(a => {
+                const pct = ((a.tokens / maxTok) * 100).toFixed(1);
+                const col = ROLE_COLOR[a.role] || '#5a6070';
+                return `<div class="bar-agent">
+      <div class="bar-id">A${a.id}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${col};opacity:0.8"></div></div>
+      <div class="bar-val">${a.tokens}</div>
+    </div>`;
+            }).join('');
+        }
+
+        function updateArtifacts(data) {
+            const arts = [...(data.recent_artifacts || [])].reverse();
+            document.getElementById('artifact-feed').innerHTML = arts.map(a => {
+                const qColor = a.quality >= 0.8 ? 'var(--green)' : a.quality >= 0.5 ? 'var(--yellow)' : 'var(--red)';
+                const detail = a.mode === 'COALITION'
+                    ? `coalition ${(a.coalition_id || '').slice(0, 8)}`
+                    : `agent ${a.agent_id}`;
+                return `<div class="artifact-item ${a.type}">
+      <div class="artifact-top">
+        <span class="artifact-type ${a.type}">${a.type}</span>
+        <span style="font-size:11px;font-weight:700;color:${qColor}">${(a.quality || 0).toFixed(3)}</span>
+      </div>
+      <div class="artifact-meta">tick ${a.tick} · ${a.mode} · ${detail}</div>
+    </div>`;
+            }).join('');
+            if (arts.length && arts[0].quality) qualityHistory.push(arts[0].quality);
+        }
+
+        function updateModel(data) {
+            const m = data.society_model || {};
+            document.getElementById('model-stats').innerHTML = [
+                { v: m.train_steps || 0, l: 'train steps' },
+                { v: m.window_size || 0, l: 'event window' },
+                { v: m.total_curiosity || 0, l: 'curiosity tokens' },
+                { v: data.episodic_count || 0, l: 'episodic records' },
+            ].map(x => `<div class="mstat"><div class="v">${x.v}</div><div class="l">${x.l}</div></div>`).join('');
+
+            const loss = m.avg_loss || 0;
+            document.getElementById('loss-fill').style.width = Math.min(100, (loss / 3) * 100).toFixed(1) + '%';
+            document.getElementById('loss-val').textContent = loss.toFixed ? loss.toFixed(3) : loss;
+
+            const coal = data.active_coalitions || [];
+            document.getElementById('coalitions').innerHTML = coal.length
+                ? coal.map(c => `<div class="coal-item">
+        <div class="coal-id">${(c.coalition_id || '').slice(0, 12)}</div>
+        <div class="coal-meta">members: [${(c.members || []).join(', ')}] · coord: ${c.coordinator} · ${c.task_type}</div>
+      </div>`).join('')
+                : '<div class="no-coal">no active coalitions</div>';
+        }
+
+        function render(data) {
+            updateHeader(data);
+            updateGraph(data);
+            updateStats(data);
+            updateEconomy(data);
+            updateArtifacts(data);
+            updateModel(data);
+        }
+
+        window.addEventListener('load', () => {
+            initGraph();
+            const ws = new WebSocket(`ws://${location.host}/ws/society`);
+            ws.onmessage = e => render(JSON.parse(e.data));
+            ws.onclose = () => {
+                document.querySelector('.pulse').style.background = 'var(--red)';
+                document.querySelector('.badge.live').textContent = 'OFFLINE';
+            };
+        });
+    </script>
+</body>
+
+</html>
