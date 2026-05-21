@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON — Personal AGI Civilization</title>
+    <title>SOCIOGENESIS</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <style>
         *,
@@ -16,214 +16,342 @@
         }
 
         :root {
-            --bg: #07080a;
-            --bg1: #0d0f12;
-            --bg2: #13151a;
-            --bg3: #1a1d24;
-            --b: rgba(255, 255, 255, 0.07);
-            --b2: rgba(255, 255, 255, 0.12);
-            --t0: #eef0f3;
-            --t1: #8892a0;
-            --t2: #454d5a;
-            --blue: #4d9fff;
-            --orange: #ff8c3a;
-            --green: #3dd68c;
-            --purple: #9d7ff0;
-            --yellow: #f5c542;
-            --red: #f56565;
-            --code: #4d9fff;
-            --research: #ff8c3a;
-            --visual: #3dd68c;
+            --bg: #0a0a0b;
+            --surface: #111113;
+            --surface2: #18181b;
+            --surface3: #1f1f23;
+            --border: rgba(255, 255, 255, 0.06);
+            --border2: rgba(255, 255, 255, 0.10);
+            --text: #e4e4e7;
+            --text2: #71717a;
+            --text3: #3f3f46;
+            --blue: #3b82f6;
+            --blue-dim: rgba(59, 130, 246, 0.12);
+            --green: #22c55e;
+            --green-dim: rgba(34, 197, 94, 0.12);
+            --amber: #f59e0b;
+            --amber-dim: rgba(245, 158, 11, 0.12);
+            --purple: #8b5cf6;
+            --purple-dim: rgba(139, 92, 246, 0.12);
+            --red: #ef4444;
+            --code: #3b82f6;
+            --research: #f59e0b;
+            --visual: #22c55e;
         }
 
         html,
         body {
             height: 100%;
             background: var(--bg);
-            color: var(--t0);
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 12px;
-            overflow: hidden
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            font-size: 13px;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased
         }
 
-        /* ── HEADER ── */
-        .hdr {
+        .topbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 52px;
-            background: var(--bg1);
-            border-bottom: 1px solid var(--b);
+            height: 56px;
+            background: rgba(10, 10, 11, 0.85);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
-            padding: 0 20px;
-            gap: 0;
+            padding: 0 24px;
+            gap: 8px;
             z-index: 200;
         }
 
-        .hdr-logo {
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: 5px;
-            color: var(--blue);
-            margin-right: 20px
+        .logo {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text);
+            margin-right: 4px
         }
 
-        .hdr-sub {
-            font-size: 10px;
-            color: var(--t2);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-right: auto
-        }
-
-        .hdr-stat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 16px;
-            border-left: 1px solid var(--b)
-        }
-
-        .hdr-stat .v {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--t0);
-            line-height: 1
-        }
-
-        .hdr-stat .l {
-            font-size: 9px;
-            color: var(--t2);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-top: 2px
-        }
-
-        .hdr-stat.blue .v {
+        .logo span {
             color: var(--blue)
         }
 
-        .hdr-stat.green .v {
-            color: var(--green)
-        }
-
-        .hdr-stat.orange .v {
-            color: var(--orange)
-        }
-
-        .hdr-stat.purple .v {
-            color: var(--purple)
-        }
-
-        .pulse {
-            width: 8px;
-            height: 8px;
+        .dot {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: var(--green);
-            animation: pulse 2s ease-in-out infinite;
-            margin-right: 10px
+            animation: blink 2s ease-in-out infinite;
+            flex-shrink: 0
         }
 
-        @keyframes pulse {
+        @keyframes blink {
 
             0%,
             100% {
-                opacity: 1;
-                transform: scale(1)
+                opacity: 1
             }
 
             50% {
-                opacity: 0.4;
-                transform: scale(0.7)
+                opacity: 0.3
             }
         }
 
-        .dl-btn {
-            padding: 6px 14px;
+        .divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 8px
+        }
+
+        .topstat {
+            display: flex;
+            flex-direction: column
+        }
+
+        .topstat .v {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1
+        }
+
+        .topstat .l {
+            font-size: 10px;
+            color: var(--text3);
+            margin-top: 2px;
+            letter-spacing: 0.3px
+        }
+
+        .spacer {
+            flex: 1
+        }
+
+        .badge {
+            padding: 5px 12px;
             border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: 500;
             cursor: pointer;
-            background: rgba(157, 127, 240, 0.15);
-            color: var(--purple);
-            border: 1px solid rgba(157, 127, 240, 0.35);
             text-decoration: none;
-            margin-left: 12px;
-            transition: background 0.2s;
+            letter-spacing: 0.2px;
+            background: var(--surface3);
+            color: var(--text);
+            border: 1px solid var(--border2);
+            transition: background 0.15s
         }
 
-        .dl-btn:hover {
-            background: rgba(157, 127, 240, 0.28)
+        .badge:hover {
+            background: var(--surface2)
         }
 
-        /* ── LAYOUT ── */
-        .root {
+        .tag {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500
+        }
+
+        .tag.live {
+            background: var(--green-dim);
+            color: var(--green)
+        }
+
+        .shell {
             position: fixed;
-            top: 52px;
+            top: 56px;
             left: 0;
             right: 0;
             bottom: 0;
             display: grid;
-            grid-template-columns: 260px 1fr 300px;
-            grid-template-rows: 1fr 180px;
-            gap: 1px;
-            background: var(--b);
+            grid-template-columns: 280px 1fr 320px;
+            grid-template-rows: 100%;
+            overflow: hidden;
         }
 
-        .panel {
-            background: var(--bg1);
-            overflow: hidden;
+        .col {
             display: flex;
             flex-direction: column;
-            min-height: 0
+            border-right: 1px solid var(--border);
+            overflow: hidden
         }
 
-        .panel.graph-panel {
-            grid-row: span 2
+        .col:last-child {
+            border-right: none
         }
 
-        .ph {
-            padding: 10px 14px 8px;
-            border-bottom: 1px solid var(--b);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .section {
+            border-bottom: 1px solid var(--border);
             flex-shrink: 0
         }
 
-        .pt {
-            font-size: 9px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--t2);
-            font-weight: 700
+        .section-header {
+            padding: 14px 20px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between
         }
 
-        .ps {
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text3);
+            letter-spacing: 0.8px;
+            text-transform: uppercase
+        }
+
+        .section-body {
+            padding: 0 20px 14px
+        }
+
+        .scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 12px 14px;
             min-height: 0
         }
 
-        .ps::-webkit-scrollbar {
-            width: 2px
+        .scroll::-webkit-scrollbar {
+            width: 0px
         }
 
-        .ps::-webkit-scrollbar-thumb {
-            background: var(--b2);
-            border-radius: 1px
+        .hero-block {
+            padding: 20px
         }
 
-        /* graph */
-        .graph-wrap {
+        .hero-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+            letter-spacing: -1px
+        }
+
+        .hero-number span {
+            color: var(--blue)
+        }
+
+        .hero-desc {
+            font-size: 13px;
+            color: var(--text2);
+            margin-top: 8px;
+            line-height: 1.6
+        }
+
+        .hero-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px
+        }
+
+        .hchip {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500
+        }
+
+        .hchip.code {
+            background: var(--blue-dim);
+            color: var(--blue)
+        }
+
+        .hchip.research {
+            background: var(--amber-dim);
+            color: var(--amber)
+        }
+
+        .hchip.visual {
+            background: var(--green-dim);
+            color: var(--visual)
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 0 20px 16px
+        }
+
+        .kpi {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 12px 14px;
+            border: 1px solid var(--border)
+        }
+
+        .kpi .v {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1
+        }
+
+        .kpi .l {
+            font-size: 11px;
+            color: var(--text3);
+            margin-top: 4px
+        }
+
+        .kpi.b .v {
+            color: var(--blue)
+        }
+
+        .kpi.g .v {
+            color: var(--green)
+        }
+
+        .kpi.a .v {
+            color: var(--amber)
+        }
+
+        .kpi.p .v {
+            color: var(--purple)
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 20px
+        }
+
+        .bar-label {
+            width: 20px;
+            font-size: 11px;
+            color: var(--text3);
+            flex-shrink: 0;
+            text-align: right
+        }
+
+        .bar-track {
             flex: 1;
-            min-height: 0;
-            position: relative
+            height: 6px;
+            background: var(--surface3);
+            border-radius: 3px;
+            overflow: hidden
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1)
+        }
+
+        .bar-val {
+            width: 42px;
+            font-size: 11px;
+            color: var(--text2);
+            text-align: right;
+            flex-shrink: 0
+        }
+
+        .graph-area {
+            flex: 1;
+            position: relative;
+            min-height: 0
         }
 
         #gsvg {
@@ -234,244 +362,82 @@
             height: 100%
         }
 
-        /* narrative hero */
-        .hero {
-            padding: 14px;
-            border-bottom: 1px solid var(--b)
-        }
-
-        .hero-line {
-            font-size: 13px;
-            color: var(--t0);
-            line-height: 1.6;
-            font-weight: 500
-        }
-
-        .hero-line span {
-            color: var(--blue)
-        }
-
-        .hero-sub {
-            font-size: 10px;
-            color: var(--t2);
-            margin-top: 4px;
-            line-height: 1.5
-        }
-
-        /* stat cards */
-        .sc-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-bottom: 10px
-        }
-
-        .sc {
-            background: var(--bg2);
-            border: 1px solid var(--b);
-            border-radius: 7px;
-            padding: 9px 11px
-        }
-
-        .sc .v {
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1
-        }
-
-        .sc .l {
-            font-size: 9px;
-            color: var(--t2);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-top: 3px
-        }
-
-        .sc.b .v {
-            color: var(--blue)
-        }
-
-        .sc.g .v {
-            color: var(--green)
-        }
-
-        .sc.o .v {
-            color: var(--orange)
-        }
-
-        .sc.p .v {
-            color: var(--purple)
-        }
-
-        /* role chips */
-        .chips {
+        .event-item {
             display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin: 8px 0
-        }
-
-        .chip {
-            padding: 3px 9px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase
-        }
-
-        .chip.code {
-            background: rgba(77, 159, 255, 0.12);
-            color: var(--code);
-            border: 1px solid rgba(77, 159, 255, 0.3)
-        }
-
-        .chip.research {
-            background: rgba(255, 140, 58, 0.12);
-            color: var(--research);
-            border: 1px solid rgba(255, 140, 58, 0.3)
-        }
-
-        .chip.visual {
-            background: rgba(61, 214, 140, 0.12);
-            color: var(--visual);
-            border: 1px solid rgba(61, 214, 140, 0.3)
-        }
-
-        /* token bars */
-        .bar {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            margin-bottom: 7px
-        }
-
-        .bid {
-            width: 22px;
-            font-size: 10px;
-            color: var(--t2);
-            text-align: right;
-            flex-shrink: 0
-        }
-
-        .btr {
-            flex: 1;
-            height: 12px;
-            background: var(--bg3);
-            border-radius: 2px;
-            overflow: hidden;
-            border: 1px solid var(--b)
-        }
-
-        .bfill {
-            height: 100%;
-            border-radius: 1px;
-            transition: width 0.5s ease
-        }
-
-        .bval {
-            width: 42px;
-            font-size: 10px;
-            color: var(--t1);
-            text-align: right;
-            flex-shrink: 0
-        }
-
-        /* event ticker */
-        .ticker {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 14px
-        }
-
-        .ticker::-webkit-scrollbar {
-            width: 2px
-        }
-
-        .ticker::-webkit-scrollbar-thumb {
-            background: var(--b2);
-            border-radius: 1px
-        }
-
-        .event {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 12px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
             align-items: flex-start
         }
 
-        .event-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+        .event-item:last-child {
+            border-bottom: none
+        }
+
+        .ev-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
-            margin-top: 3px
-        }
-
-        .event-dot.coal {
-            background: var(--purple)
-        }
-
-        .event-dot.solo {
-            background: var(--t2)
-        }
-
-        .event-dot.evo {
-            background: var(--red)
-        }
-
-        .event-dot.good {
-            background: var(--green)
-        }
-
-        .event-body {
-            flex: 1
-        }
-
-        .event-title {
-            font-size: 11px;
-            color: var(--t0);
-            line-height: 1.4
-        }
-
-        .event-meta {
-            font-size: 10px;
-            color: var(--t2);
+            font-size: 12px;
+            font-weight: 700;
             margin-top: 1px
         }
 
-        /* artifact feed */
-        .art {
-            padding: 8px 10px;
-            border-radius: 5px;
-            margin-bottom: 6px;
-            background: var(--bg2);
-            border-left: 3px solid var(--b2)
+        .ev-icon.coal {
+            background: var(--purple-dim);
+            color: var(--purple)
         }
 
-        .art.code {
-            border-color: var(--code)
+        .ev-icon.solo {
+            background: var(--surface3);
+            color: var(--text3)
         }
 
-        .art.research {
-            border-color: var(--research)
+        .ev-icon.evo {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--red)
         }
 
-        .art.visual {
-            border-color: var(--visual)
+        .ev-icon.ms {
+            background: var(--green-dim);
+            color: var(--green)
         }
 
-        .art-top {
+        .ev-body .title {
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.4
+        }
+
+        .ev-body .meta {
+            font-size: 11px;
+            color: var(--text3);
+            margin-top: 2px
+        }
+
+        .art-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .art-item:last-child {
+            border-bottom: none
+        }
+
+        .art-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2px
+            justify-content: space-between
         }
 
         .art-type {
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
             text-transform: uppercase
         }
 
@@ -487,270 +453,327 @@
             color: var(--visual)
         }
 
+        .art-score {
+            font-size: 13px;
+            font-weight: 600
+        }
+
         .art-meta {
-            font-size: 10px;
-            color: var(--t2)
+            font-size: 11px;
+            color: var(--text3);
+            margin-top: 3px
         }
 
-        /* milestones */
-        .ms {
-            padding: 6px 10px;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            background: var(--bg3);
-            border: 1px solid var(--b);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 10px
+        .coal-item {
+            margin: 0 20px 8px;
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 12px 14px;
+            border: 1px solid var(--border)
         }
 
-        .ms-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--green);
-            flex-shrink: 0
+        .coal-item:first-child {
+            margin-top: 12px
         }
 
-        .ms.locked .ms-dot {
-            background: var(--t2)
+        .coal-head {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text)
         }
 
-        .ms.locked {
-            opacity: 0.4
-        }
-
-        /* loss bar */
-        .loss-wrap {
-            margin-top: 10px
-        }
-
-        .loss-track {
-            height: 3px;
-            background: var(--bg3);
-            border-radius: 2px;
-            margin-top: 4px;
-            overflow: hidden
-        }
-
-        .loss-fill {
-            height: 100%;
-            background: var(--purple);
-            border-radius: 2px;
-            transition: width 0.5s
-        }
-
-        .loss-row {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 3px;
-            font-size: 9px;
-            color: var(--t2)
-        }
-
-        /* coal indicator */
-        .coal-card {
-            padding: 8px 10px;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            background: var(--bg2);
-            border: 1px solid rgba(157, 127, 240, 0.25)
-        }
-
-        .coal-title {
-            font-size: 10px;
-            color: var(--purple);
-            font-weight: 700
+        .coal-sub {
+            font-size: 11px;
+            color: var(--text3);
+            margin-top: 3px
         }
 
         .coal-members {
             display: flex;
-            gap: 4px;
-            margin-top: 5px;
+            gap: 5px;
+            margin-top: 8px;
             flex-wrap: wrap
         }
 
         .cm {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9px;
-            font-weight: 700;
-            border: 2px solid
+            font-size: 10px;
+            font-weight: 600;
+            border: 1.5px solid
         }
 
         .cm.code {
-            background: rgba(77, 159, 255, 0.15);
-            color: var(--code);
-            border-color: rgba(77, 159, 255, 0.4)
+            background: var(--blue-dim);
+            color: var(--blue);
+            border-color: rgba(59, 130, 246, 0.3)
         }
 
         .cm.research {
-            background: rgba(255, 140, 58, 0.15);
-            color: var(--research);
-            border-color: rgba(255, 140, 58, 0.4)
+            background: var(--amber-dim);
+            color: var(--amber);
+            border-color: rgba(245, 158, 11, 0.3)
         }
 
         .cm.visual {
-            background: rgba(61, 214, 140, 0.15);
+            background: var(--green-dim);
             color: var(--visual);
-            border-color: rgba(61, 214, 140, 0.4)
+            border-color: rgba(34, 197, 94, 0.3)
         }
 
         .cm.unknown {
-            background: var(--bg3);
-            color: var(--t2);
-            border-color: var(--b2)
+            background: var(--surface3);
+            color: var(--text3);
+            border-color: var(--border2)
         }
 
         .no-coal {
-            font-size: 11px;
-            color: var(--t2);
-            font-style: italic;
-            padding: 4px 0
+            padding: 12px 20px;
+            font-size: 12px;
+            color: var(--text3);
+            font-style: italic
         }
 
-        /* section label */
-        .slabel {
-            font-size: 9px;
-            color: var(--t2);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin: 10px 0 6px;
-            padding-bottom: 4px;
-            border-bottom: 1px solid var(--b)
+        .ms-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 20px
+        }
+
+        .ms-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .ms-dot.done {
+            background: var(--green)
+        }
+
+        .ms-dot.todo {
+            background: var(--surface3);
+            border: 1px solid var(--border2)
+        }
+
+        .ms-label {
+            font-size: 12px
+        }
+
+        .ms-label.done {
+            color: var(--text)
+        }
+
+        .ms-label.todo {
+            color: var(--text3)
+        }
+
+        .loss-section {
+            padding: 14px 20px
+        }
+
+        .loss-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 6px
+        }
+
+        .loss-label span:first-child {
+            color: var(--text3)
+        }
+
+        .loss-label span:last-child {
+            color: var(--purple);
+            font-weight: 500
+        }
+
+        .loss-track {
+            height: 4px;
+            background: var(--surface3);
+            border-radius: 2px;
+            overflow: hidden
+        }
+
+        .loss-bar {
+            height: 100%;
+            background: var(--purple);
+            border-radius: 2px;
+            transition: width 0.5s
         }
     </style>
 </head>
 
 <body>
 
-    <header class="hdr">
-        <div class="pulse"></div>
-        <div class="hdr-logo">PANTHEON</div>
-        <div class="hdr-sub">Personal AGI Civilization · MacBook M4</div>
-        <div class="hdr-stat blue">
+    <div class="topbar">
+        <div class="dot"></div>
+        <div class="logo">SOCIO<span>GENESIS</span></div>
+        <div class="tag live">LIVE</div>
+        <div class="divider"></div>
+        <div class="topstat">
             <div class="v" id="h-tick">0</div>
             <div class="l">tick</div>
         </div>
-        <div class="hdr-stat green">
+        <div class="divider"></div>
+        <div class="topstat">
             <div class="v" id="h-quality">—</div>
             <div class="l">avg quality</div>
         </div>
-        <div class="hdr-stat orange">
+        <div class="divider"></div>
+        <div class="topstat">
             <div class="v" id="h-ep">0</div>
             <div class="l">memories</div>
         </div>
-        <div class="hdr-stat purple">
-            <div class="v" id="h-roles">0</div>
-            <div class="l">role clusters</div>
+        <div class="divider"></div>
+        <div class="topstat">
+            <div class="v" id="h-evo">0</div>
+            <div class="l">evolutions</div>
         </div>
-        <a class="dl-btn" href="/paper" target="_blank">Download Paper</a>
-    </header>
+        <div class="spacer"></div>
+        <a class="badge" href="/paper" target="_blank">Download paper</a>
+    </div>
 
-    <div class="root">
+    <div class="shell">
 
-        <!-- LEFT: narrative + economy -->
-        <div class="panel" style="grid-row:span 2">
-            <div class="hero" id="hero-box">
-                <div class="hero-line" id="hero-line">Waiting for society to start...</div>
-                <div class="hero-sub" id="hero-sub">—</div>
+        <!-- LEFT COLUMN -->
+        <div class="col">
+            <div class="hero-block section">
+                <div class="hero-number" id="hero-number">—</div>
+                <div class="hero-desc" id="hero-desc">Society initialising...</div>
+                <div class="hero-chips" id="hero-chips"></div>
             </div>
-            <div class="ph">
-                <div class="pt">Token Economy</div>
-            </div>
-            <div class="ps" id="economy-bars"></div>
-            <div class="ph">
-                <div class="pt">Milestones</div>
-            </div>
-            <div class="ps" id="milestones"></div>
-        </div>
-
-        <!-- CENTER: agent graph -->
-        <div class="panel graph-panel">
-            <div class="ph">
-                <div class="pt">Agent Society</div>
-                <div id="coal-label" style="margin-left:auto;font-size:10px;color:var(--purple);font-weight:700"></div>
-            </div>
-            <div class="graph-wrap"><svg id="gsvg"></svg></div>
-        </div>
-
-        <!-- RIGHT TOP: coalitions + model -->
-        <div class="panel">
-            <div class="ph">
-                <div class="pt">Active Coalitions</div>
-            </div>
-            <div class="ps">
-                <div id="coalitions"></div>
-                <div class="slabel">Society Model</div>
-                <div class="sc-grid" id="model-stats"></div>
-                <div class="loss-wrap">
-                    <div class="loss-track">
-                        <div class="loss-fill" id="loss-fill" style="width:0%"></div>
-                    </div>
-                    <div class="loss-row"><span>prediction loss</span><span id="loss-val">—</span></div>
+            <div class="kpi-row">
+                <div class="kpi b">
+                    <div class="v" id="k-tick">0</div>
+                    <div class="l">Current tick</div>
+                </div>
+                <div class="kpi g">
+                    <div class="v" id="k-ep">0</div>
+                    <div class="l">Episodic records</div>
+                </div>
+                <div class="kpi a">
+                    <div class="v" id="k-nodes">0</div>
+                    <div class="l">Semantic nodes</div>
+                </div>
+                <div class="kpi p">
+                    <div class="v" id="k-coal">0</div>
+                    <div class="l">Active coalitions</div>
                 </div>
             </div>
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">Token economy</div>
+                </div>
+                <div id="economy"></div>
+            </div>
+            <div class="section scroll" style="flex:1">
+                <div class="section-header">
+                    <div class="section-title">Milestones</div>
+                </div>
+                <div id="milestones"></div>
+            </div>
         </div>
 
-        <!-- CENTER BOTTOM: event ticker -->
-        <div class="panel">
-            <div class="ph">
-                <div class="pt">Live Events</div>
+        <!-- CENTER COLUMN -->
+        <div class="col" style="border-right:1px solid var(--border)">
+            <div class="section-header" style="padding:14px 20px 12px;flex-shrink:0">
+                <div class="section-title">Agent society</div>
+                <div id="coal-label" style="font-size:12px;color:var(--purple);font-weight:500"></div>
             </div>
-            <div class="ticker" id="ticker"></div>
+            <div class="graph-area">
+                <svg id="gsvg"></svg>
+            </div>
+            <div class="section scroll" style="height:220px;flex-shrink:0">
+                <div class="section-header">
+                    <div class="section-title">Live events</div>
+                </div>
+                <div id="ticker"></div>
+            </div>
         </div>
 
-        <!-- RIGHT BOTTOM: artifact feed -->
-        <div class="panel">
-            <div class="ph">
-                <div class="pt">Artifact Feed</div>
+        <!-- RIGHT COLUMN -->
+        <div class="col">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">Active coalitions</div>
+                </div>
+                <div id="coalitions"></div>
             </div>
-            <div class="ps" id="artifact-feed"></div>
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">Society model</div>
+                </div>
+                <div class="kpi-row" style="padding:0 20px 12px">
+                    <div class="kpi p">
+                        <div class="v" id="m-steps">0</div>
+                        <div class="l">Train steps</div>
+                    </div>
+                    <div class="kpi b">
+                        <div class="v" id="m-curiosity">0</div>
+                        <div class="l">Curiosity tokens</div>
+                    </div>
+                </div>
+                <div class="loss-section">
+                    <div class="loss-label">
+                        <span>Prediction loss</span>
+                        <span id="loss-val">—</span>
+                    </div>
+                    <div class="loss-track">
+                        <div class="loss-bar" id="loss-bar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll" style="flex:1">
+                <div class="section-header" style="padding:14px 20px 10px">
+                    <div class="section-title">Artifact feed</div>
+                </div>
+                <div id="artifacts"></div>
+            </div>
         </div>
 
     </div>
 
     <script>
-        const RC = { code: '#4d9fff', research: '#ff8c3a', visual: '#3dd68c', unknown: '#454d5a' };
+        const RC = { code: '#3b82f6', research: '#f59e0b', visual: '#22c55e', unknown: '#3f3f46' };
         let sim, svgEl, linkG, nodeG;
         let nodes = [], links = [];
-        let qualHist = [], tickerItems = [], milestones = {};
+        let qualHist = [], events = [], doneMS = {}, evoCount = 0;
         let agentRoles = {};
 
-        const MILESTONES = [
-            { id: 'first_coal', label: 'First coalition formed', check: d => d.active_coalitions.length > 0 || tickerItems.some(t => t.type === 'coal') },
-            { id: 'specialist', label: '3 role clusters emerged', check: d => Object.keys(d.roles || {}).length >= 3 },
-            { id: 'ep100', label: '100 memories stored', check: d => d.episodic_count >= 100 },
-            { id: 'ep500', label: '500 memories stored', check: d => d.episodic_count >= 500 },
-            { id: 'evolution', label: 'First agent evolved', check: () => tickerItems.some(t => t.type === 'evo') },
-            { id: 'nodes10', label: '10 semantic nodes distilled', check: d => d.semantic_nodes >= 10 },
-            { id: 'tick500', label: '500 ticks completed', check: d => d.tick >= 500 },
-            { id: 'paper', label: 'Society wrote its own paper', check: () => false },
+        const MS = [
+            { id: 'c1', l: 'First coalition formed', check: d => d.active_coalitions.length > 0 || events.some(e => e.t === 'coal') },
+            { id: 'r3', l: '3 role clusters emerged', check: d => Object.keys(d.roles || {}).length >= 3 },
+            { id: 'e100', l: '100 memories stored', check: d => d.episodic_count >= 100 },
+            { id: 'e500', l: '500 memories stored', check: d => d.episodic_count >= 500 },
+            { id: 'ev1', l: 'First agent evolved', check: () => evoCount > 0 },
+            { id: 'n10', l: '10 semantic nodes', check: d => d.semantic_nodes >= 10 },
+            { id: 't500', l: '500 ticks completed', check: d => d.tick >= 500 },
+            { id: 't1k', l: '1000 ticks completed', check: d => d.tick >= 1000 },
         ];
 
         function gd() {
-            const el = document.getElementById('gsvg');
-            const r = el.getBoundingClientRect();
-            return { w: r.width || 700, h: r.height || 400 };
+            const r = document.getElementById('gsvg').getBoundingClientRect();
+            return { w: r.width || 600, h: r.height || 400 };
         }
 
         function initGraph() {
             svgEl = d3.select('#gsvg');
             const { w, h } = gd();
             sim = d3.forceSimulation()
-                .force('link', d3.forceLink().id(d => d.id).distance(90).strength(0.5))
-                .force('charge', d3.forceManyBody().strength(-250))
+                .force('link', d3.forceLink().id(d => d.id).distance(100).strength(0.4))
+                .force('charge', d3.forceManyBody().strength(-280))
                 .force('center', d3.forceCenter(w / 2, h / 2))
-                .force('collision', d3.forceCollide().radius(d => d.r + 10))
+                .force('collision', d3.forceCollide().radius(d => d.r + 12))
                 .force('bound', () => {
-                    nodes.forEach(n => {
-                        n.x = Math.max(n.r + 16, Math.min(w - n.r - 16, n.x || w / 2));
-                        n.y = Math.max(n.r + 16, Math.min(h - n.r - 16, n.y || h / 2));
+                    const { w, h } = gd(); nodes.forEach(n => {
+                        n.x = Math.max(n.r + 20, Math.min(w - n.r - 20, n.x || w / 2));
+                        n.y = Math.max(n.r + 20, Math.min(h - n.r - 20, n.y || h / 2));
                     })
                 });
             linkG = svgEl.append('g');
@@ -765,10 +788,10 @@
             const prev = {};
             nodes.forEach(n => { prev[n.id] = { x: n.x, y: n.y, vx: n.vx || 0, vy: n.vy || 0 } });
             nodes = data.agents.map(a => {
-                const p = prev[a.id] || { x: w / 2 + (Math.random() - .5) * 160, y: h / 2 + (Math.random() - .5) * 160, vx: 0, vy: 0 };
+                const p = prev[a.id] || { x: w / 2 + (Math.random() - .5) * 180, y: h / 2 + (Math.random() - .5) * 180, vx: 0, vy: 0 };
                 return {
                     id: a.id, role: a.role, rep: a.reputation, tok: a.tokens,
-                    r: Math.max(14, Math.min(30, 14 + a.reputation * 22)),
+                    r: Math.max(16, Math.min(34, 16 + a.reputation * 24)),
                     x: p.x, y: p.y, vx: p.vx, vy: p.vy
                 };
             });
@@ -780,49 +803,42 @@
 
             linkG.selectAll('line').data(links, d => `${d.source}-${d.target}`)
                 .join(
-                    e => e.append('line').attr('stroke', 'rgba(157,127,240,0.5)')
-                        .attr('stroke-width', 2.5).attr('stroke-dasharray', '6,3'),
+                    e => e.append('line').attr('stroke', 'rgba(139,92,246,0.4)')
+                        .attr('stroke-width', 2).attr('stroke-dasharray', '5,4'),
                     u => u, x => x.remove()
                 );
 
-            const ng = nodeG.selectAll('g.ag').data(nodes, d => d.id)
+            const ng = nodeG.selectAll('g.nd').data(nodes, d => d.id)
                 .join(
                     e => {
-                        const g = e.append('g').attr('class', 'ag').style('cursor', 'grab');
-                        g.append('circle').attr('class', 'aura').attr('fill', 'none').attr('stroke-width', 2);
-                        g.append('circle').attr('class', 'body');
-                        g.append('text').attr('text-anchor', 'middle').attr('dy', '0.38em')
-                            .attr('fill', '#fff').style('pointer-events', 'none')
-                            .style('font-family', 'monospace').style('font-weight', '800');
-                        g.append('text').attr('class', 'role-label').attr('text-anchor', 'middle')
-                            .attr('fill', 'rgba(255,255,255,0.45)').style('pointer-events', 'none')
-                            .style('font-family', 'monospace').style('font-weight', '600');
+                        const g = e.append('g').attr('class', 'nd').style('cursor', 'grab');
+                        g.append('circle').attr('class', 'halo').attr('fill', 'none').attr('stroke-width', 1);
+                        g.append('circle').attr('class', 'core');
+                        g.append('text').attr('class', 'lbl').attr('text-anchor', 'middle').attr('dy', '0.35em')
+                            .style('pointer-events', 'none').style('font-family', 'inherit')
+                            .style('font-weight', '600').attr('fill', 'white');
+                        g.append('text').attr('class', 'rlbl').attr('text-anchor', 'middle')
+                            .style('pointer-events', 'none').style('font-family', 'inherit')
+                            .style('font-weight', '500').attr('fill', 'rgba(255,255,255,0.4)');
                         return g;
-                    },
-                    u => u, x => x.remove()
+                    }, u => u, x => x.remove()
                 );
 
-            ng.select('.aura')
-                .attr('r', d => d.r + 8)
+            ng.select('.halo')
+                .attr('r', d => d.r + 10)
                 .attr('stroke', d => RC[d.role] || RC.unknown)
-                .attr('stroke-dasharray', '4,4')
-                .attr('opacity', d => Math.min(0.6, 0.1 + d.rep * 0.6));
+                .attr('opacity', d => Math.min(0.5, 0.08 + d.rep * 0.5));
 
-            ng.select('.body')
+            ng.select('.core')
                 .attr('r', d => d.r)
                 .attr('fill', d => RC[d.role] || RC.unknown)
                 .attr('fill-opacity', 0.9)
-                .attr('stroke', d => RC[d.role] || RC.unknown)
-                .attr('stroke-width', 2).attr('stroke-opacity', 0.6);
+                .attr('stroke', 'rgba(255,255,255,0.1)')
+                .attr('stroke-width', 1);
 
-            ng.select('text:not(.role-label)')
-                .attr('font-size', d => d.r < 18 ? 9 : 11)
-                .text(d => `A${d.id}`);
-
-            ng.select('.role-label')
-                .attr('dy', d => d.r + 14)
-                .attr('font-size', 8)
-                .text(d => d.role === 'unknown' ? '' : d.role.slice(0, 3).toUpperCase());
+            ng.select('.lbl').attr('font-size', d => d.r < 20 ? 10 : 12).text(d => `A${d.id}`);
+            ng.select('.rlbl').attr('dy', d => d.r + 16).attr('font-size', 9)
+                .text(d => d.role === 'unknown' ? '' : d.role.slice(0, 4).toUpperCase());
 
             ng.call(d3.drag()
                 .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y })
@@ -836,138 +852,142 @@
                     .attr('y1', d => typeof d.source === 'object' ? d.source.y : 0)
                     .attr('x2', d => typeof d.target === 'object' ? d.target.x : 0)
                     .attr('y2', d => typeof d.target === 'object' ? d.target.y : 0);
-                nodeG.selectAll('g.ag').attr('transform', d => `translate(${d.x || 0},${d.y || 0})`);
+                nodeG.selectAll('g.nd').attr('transform', d => `translate(${d.x || 0},${d.y || 0})`);
             });
             sim.force('link').links(links);
             sim.alpha(0.15).restart();
 
             const cl = data.active_coalitions;
             document.getElementById('coal-label').textContent =
-                cl.length ? `${cl.length} coalition${cl.length > 1 ? 's' : ''} forming` : '';
+                cl.length ? `${cl.length} coalition${cl.length > 1 ? 's' : ''} active` : '';
         }
 
         function updateHero(data) {
             const roles = data.roles || {};
-            const nRoles = Object.keys(roles).length;
-            const nAgents = data.agents.length;
-            const ep = data.episodic_count;
-            const coal = data.active_coalitions.length;
-
-            let line = '', sub = '';
-            if (nRoles >= 3) {
-                line = `<span>${nAgents} identical agents</span> evolved into <span>${nRoles} specialist roles</span>`;
-                sub = `${roles.code || 0} coders · ${roles.research || 0} researchers · ${roles.visual || 0} visualizers — nobody assigned these roles`;
-            } else if (nRoles >= 2) {
-                line = `<span>${nAgents} agents</span> are beginning to specialise`;
-                sub = `Role clusters emerging from task exposure — no labels, no assignments`;
+            const nr = Object.keys(roles).length;
+            const na = data.agents.length;
+            let num, desc;
+            if (nr >= 3) {
+                num = `${na} agents → <span style="color:var(--blue)">${nr} roles</span>`;
+                desc = `Started identical. Now specialised. Nobody assigned these roles — they emerged from task exposure and economic pressure.`;
+            } else if (nr >= 2) {
+                num = `${na} agents → <span style="color:var(--amber)">${nr} roles forming</span>`;
+                desc = `Specialisation beginning. Agents are diverging based on which tasks they win.`;
             } else {
-                line = `<span>${nAgents} identical agents</span> exploring the task space`;
-                sub = `Tick ${data.tick} — specialisation emerging soon`;
+                num = `<span style="color:var(--text2)">${na} identical agents</span>`;
+                desc = `All agents start the same. Roles will emerge through competition and task exposure.`;
             }
-            if (coal > 0) sub += ` · ${coal} coalition${coal > 1 ? 's' : ''} active right now`;
-            document.getElementById('hero-line').innerHTML = line;
-            document.getElementById('hero-sub').textContent = sub;
-            document.getElementById('h-roles').textContent = nRoles;
+            document.getElementById('hero-number').innerHTML = num;
+            document.getElementById('hero-desc').textContent = desc;
+            document.getElementById('hero-chips').innerHTML = Object.entries(roles)
+                .map(([r, c]) => `<div class="hchip ${r}">${c} ${r}</div>`).join('');
         }
 
         function updateHeader(data) {
             document.getElementById('h-tick').textContent = data.tick;
             document.getElementById('h-ep').textContent = data.episodic_count;
+            document.getElementById('h-evo').textContent = evoCount;
             if (qualHist.length > 0) {
                 const avg = qualHist.slice(-30).reduce((a, b) => a + b, 0) / Math.min(30, qualHist.length);
                 document.getElementById('h-quality').textContent = avg.toFixed(3);
             }
         }
 
+        function updateKPIs(data) {
+            document.getElementById('k-tick').textContent = data.tick;
+            document.getElementById('k-ep').textContent = data.episodic_count;
+            document.getElementById('k-nodes').textContent = data.semantic_nodes;
+            document.getElementById('k-coal').textContent = data.active_coalitions.length;
+        }
+
         function updateEconomy(data) {
             const max = Math.max(...data.agents.map(a => a.tokens), 1);
-            document.getElementById('economy-bars').innerHTML = data.agents.map(a => {
+            document.getElementById('economy').innerHTML = data.agents.map(a => {
                 const pct = ((a.tokens / max) * 100).toFixed(1);
-                const col = RC[a.role] || RC.unknown;
-                return `<div class="bar">
-      <div class="bid">A${a.id}</div>
-      <div class="btr"><div class="bfill" style="width:${pct}%;background:${col};opacity:0.85"></div></div>
-      <div class="bval">${a.tokens}</div>
+                return `<div class="bar-row">
+      <div class="bar-label">A${a.id}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${RC[a.role] || RC.unknown};opacity:0.85"></div></div>
+      <div class="bar-val">${a.tokens}</div>
     </div>`;
             }).join('');
         }
 
         function updateCoalitions(data) {
             const coal = data.active_coalitions || [];
-            document.getElementById('coalitions').innerHTML = coal.length
-                ? coal.map(c => {
-                    const members = (c.members || []).map(id => {
-                        const role = agentRoles[id] || 'unknown';
-                        return `<div class="cm ${role}" title="${role}">A${id}</div>`;
-                    }).join('');
-                    return `<div class="coal-card">
-        <div class="coal-title">${(c.coalition_id || '').slice(0, 10)} · ${c.task_type || ''}</div>
-        <div class="coal-meta" style="font-size:9px;color:var(--t2);margin-top:2px">coord: A${c.coordinator}</div>
-        <div class="coal-members">${members}</div>
-      </div>`;
-                }).join('')
-                : '<div class="no-coal">no active coalitions</div>';
+            if (!coal.length) {
+                document.getElementById('coalitions').innerHTML = '<div class="no-coal">No active coalitions</div>';
+                return;
+            }
+            document.getElementById('coalitions').innerHTML = coal.map(c => `
+    <div class="coal-item">
+      <div class="coal-head">${c.task_type || 'unknown'} task</div>
+      <div class="coal-sub">Coordinator: A${c.coordinator} · ${(c.coalition_id || '').slice(0, 10)}</div>
+      <div class="coal-members">${(c.members || []).map(id => `
+        <div class="cm ${agentRoles[id] || 'unknown'}" title="${agentRoles[id] || '?'}">A${id}</div>`).join('')}
+      </div>
+    </div>`).join('');
         }
 
         function updateModel(data) {
             const m = data.society_model || {};
-            document.getElementById('model-stats').innerHTML = [
-                { v: m.train_steps || 0, l: 'train steps', cls: 'p' },
-                { v: m.total_curiosity || 0, l: 'curiosity tokens', cls: 'b' },
-            ].map(x => `<div class="sc ${x.cls}"><div class="v">${x.v}</div><div class="l">${x.l}</div></div>`).join('');
+            document.getElementById('m-steps').textContent = m.train_steps || 0;
+            document.getElementById('m-curiosity').textContent = m.total_curiosity || 0;
             const loss = m.avg_loss || 0;
-            document.getElementById('loss-fill').style.width = Math.min(100, (loss / 3) * 100).toFixed(1) + '%';
-            document.getElementById('loss-val').textContent = loss.toFixed ? loss.toFixed(3) : loss;
+            document.getElementById('loss-bar').style.width = Math.min(100, (loss / 3) * 100).toFixed(1) + '%';
+            document.getElementById('loss-val').textContent = (loss.toFixed ? loss.toFixed(3) : loss);
         }
 
-        function addEvent(type, title, meta) {
-            tickerItems.unshift({ type, title, meta, t: Date.now() });
-            if (tickerItems.length > 40) tickerItems = tickerItems.slice(0, 40);
-            document.getElementById('ticker').innerHTML = tickerItems.map(ev => `
-    <div class="event">
-      <div class="event-dot ${ev.type}"></div>
-      <div class="event-body">
-        <div class="event-title">${ev.title}</div>
-        <div class="event-meta">${ev.meta}</div>
+        function addEvent(t, title, meta) {
+            events.unshift({ t, title, meta });
+            if (events.length > 50) events = events.slice(0, 50);
+            const icons = { coal: 'C', solo: '→', evo: '↻', ms: '✓' };
+            document.getElementById('ticker').innerHTML = events.map(ev => `
+    <div class="event-item">
+      <div class="ev-icon ${ev.t}">${icons[ev.t] || '·'}</div>
+      <div class="ev-body">
+        <div class="title">${ev.title}</div>
+        <div class="meta">${ev.meta}</div>
       </div>
     </div>`).join('');
         }
 
         function updateArtifacts(data) {
             const arts = [...(data.recent_artifacts || [])].reverse();
-            if (arts.length && arts[0].quality) qualHist.push(arts[0].quality);
-            document.getElementById('artifact-feed').innerHTML = arts.map(a => {
-                const qc = a.quality >= 0.8 ? 'var(--green)' : a.quality >= 0.5 ? 'var(--yellow)' : 'var(--red)';
-                const who = a.mode === 'COALITION' ? `coalition` : `agent A${a.agent_id}`;
-                return `<div class="art ${a.type}">
-      <div class="art-top">
+            arts.forEach(a => { if (a.quality) qualHist.push(a.quality) });
+            if (qualHist.length > 200) qualHist = qualHist.slice(-200);
+            document.getElementById('artifacts').innerHTML = arts.map(a => {
+                const qc = a.quality >= 0.8 ? 'var(--green)' : a.quality >= 0.5 ? 'var(--amber)' : 'var(--red)';
+                const who = a.mode === 'COALITION' ? 'coalition' : `agent A${a.agent_id}`;
+                return `<div class="art-item">
+      <div class="art-row">
         <span class="art-type ${a.type}">${a.type}</span>
-        <span style="font-size:11px;font-weight:700;color:${qc}">${(a.quality || 0).toFixed(3)}</span>
+        <span class="art-score" style="color:${qc}">${(a.quality || 0).toFixed(3)}</span>
       </div>
-      <div class="art-meta">tick ${a.tick} · ${who}</div>
+      <div class="art-meta">Tick ${a.tick} · ${who}</div>
     </div>`;
             }).join('');
         }
 
         function updateMilestones(data) {
-            MILESTONES.forEach(m => {
-                if (!milestones[m.id] && m.check(data)) {
-                    milestones[m.id] = true;
-                    addEvent('good', `Milestone: ${m.label}`, 'Achievement unlocked');
+            MS.forEach(m => {
+                if (!doneMS[m.id] && m.check(data)) {
+                    doneMS[m.id] = true;
+                    addEvent('ms', m.l, 'Milestone reached');
                 }
             });
-            document.getElementById('milestones').innerHTML = MILESTONES.map(m => `
-    <div class="ms ${milestones[m.id] ? '' : 'locked'}">
-      <div class="ms-dot"></div>
-      <span style="color:${milestones[m.id] ? 'var(--t0)' : 'var(--t2)'}">${m.label}</span>
+            document.getElementById('milestones').innerHTML = MS.map(m => `
+    <div class="ms-item">
+      <div class="ms-dot ${doneMS[m.id] ? 'done' : 'todo'}"></div>
+      <div class="ms-label ${doneMS[m.id] ? 'done' : 'todo'}">${m.l}</div>
     </div>`).join('');
         }
 
-        let lastTick = -1, lastCoalCount = 0;
+        let lastTick = -1, lastCoalN = 0;
         function render(data) {
             updateHeader(data);
             updateHero(data);
             updateGraph(data);
+            updateKPIs(data);
             updateEconomy(data);
             updateCoalitions(data);
             updateModel(data);
@@ -981,30 +1001,30 @@
                     const a = arts[arts.length - 1];
                     if (a.mode === 'COALITION') {
                         addEvent('coal',
-                            `Coalition produced ${a.type} artifact`,
-                            `Quality ${(a.quality || 0).toFixed(3)} · ${(data.active_coalitions[0]?.members || []).map(i => 'A' + i).join(', ')}`
+                            `Coalition produced a ${a.type} artifact`,
+                            `Quality ${(a.quality || 0).toFixed(3)} · tick ${a.tick}`
                         );
                     }
                 }
             }
-            if (data.active_coalitions.length > lastCoalCount && data.active_coalitions.length > 0) {
+            if (data.active_coalitions.length > lastCoalN && data.active_coalitions.length > 0) {
                 const c = data.active_coalitions[0];
                 addEvent('coal',
-                    `New coalition forming — ${c.task_type} task`,
-                    `Members: ${(c.members || []).map(i => 'A' + i).join(', ')} · coordinator A${c.coordinator}`
+                    `New coalition — ${c.task_type} task`,
+                    `Agents ${(c.members || []).map(i => 'A' + i).join(', ')} · coordinator A${c.coordinator}`
                 );
             }
-            lastCoalCount = data.active_coalitions.length;
+            lastCoalN = data.active_coalitions.length;
         }
 
         window.addEventListener('load', () => {
             initGraph();
-            addEvent('solo', 'Society starting up', 'Agents initialising with identical fingerprints');
+            addEvent('solo', 'Society starting', 'Agents initialising with identical fingerprints');
             const ws = new WebSocket(`ws://${location.host}/ws/society`);
             ws.onmessage = e => render(JSON.parse(e.data));
             ws.onclose = () => {
-                document.querySelector('.pulse').style.background = 'var(--red)';
-                addEvent('evo', 'Connection lost', 'Reconnect to resume');
+                document.querySelector('.dot').style.background = 'var(--red)';
+                addEvent('evo', 'Disconnected', 'Refresh to reconnect');
             };
         });
     </script>
