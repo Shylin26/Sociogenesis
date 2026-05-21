@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON</title>
+    <title>PANTHEON — Personal AGI Civilization</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <style>
         *,
@@ -12,57 +12,109 @@
         *::after {
             box-sizing: border-box;
             margin: 0;
-            padding: 0;
+            padding: 0
         }
 
         :root {
-            --bg0: #08090a;
-            --bg1: #0f1012;
-            --bg2: #16181c;
-            --bg3: #1e2026;
-            --border: rgba(255, 255, 255, 0.06);
-            --border2: rgba(255, 255, 255, 0.10);
-            --text0: #f0f0f0;
-            --text1: #a0a6b0;
-            --text2: #5a6070;
-            --blue: #4a9eff;
-            --orange: #ff8c42;
-            --green: #42d98a;
-            --purple: #a78bfa;
-            --yellow: #fbbf24;
-            --red: #f87171;
+            --bg: #07080a;
+            --bg1: #0d0f12;
+            --bg2: #13151a;
+            --bg3: #1a1d24;
+            --b: rgba(255, 255, 255, 0.07);
+            --b2: rgba(255, 255, 255, 0.12);
+            --t0: #eef0f3;
+            --t1: #8892a0;
+            --t2: #454d5a;
+            --blue: #4d9fff;
+            --orange: #ff8c3a;
+            --green: #3dd68c;
+            --purple: #9d7ff0;
+            --yellow: #f5c542;
+            --red: #f56565;
+            --code: #4d9fff;
+            --research: #ff8c3a;
+            --visual: #3dd68c;
         }
 
         html,
         body {
             height: 100%;
-            background: var(--bg0);
-            color: var(--text0);
-            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            background: var(--bg);
+            color: var(--t0);
+            font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 12px;
-            overflow: hidden;
+            overflow: hidden
         }
 
-        header {
-            height: 48px;
-            background: var(--bg1);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            gap: 16px;
+        /* ── HEADER ── */
+        .hdr {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 100;
+            height: 52px;
+            background: var(--bg1);
+            border-bottom: 1px solid var(--b);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 0;
+            z-index: 200;
         }
 
-        .logo {
-            font-size: 15px;
-            font-weight: 700;
-            letter-spacing: 4px;
+        .hdr-logo {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: 5px;
             color: var(--blue);
+            margin-right: 20px
+        }
+
+        .hdr-sub {
+            font-size: 10px;
+            color: var(--t2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-right: auto
+        }
+
+        .hdr-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 16px;
+            border-left: 1px solid var(--b)
+        }
+
+        .hdr-stat .v {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--t0);
+            line-height: 1
+        }
+
+        .hdr-stat .l {
+            font-size: 9px;
+            color: var(--t2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px
+        }
+
+        .hdr-stat.blue .v {
+            color: var(--blue)
+        }
+
+        .hdr-stat.green .v {
+            color: var(--green)
+        }
+
+        .hdr-stat.orange .v {
+            color: var(--orange)
+        }
+
+        .hdr-stat.purple .v {
+            color: var(--purple)
         }
 
         .pulse {
@@ -71,6 +123,7 @@
             border-radius: 50%;
             background: var(--green);
             animation: pulse 2s ease-in-out infinite;
+            margin-right: 10px
         }
 
         @keyframes pulse {
@@ -82,65 +135,43 @@
             }
 
             50% {
-                opacity: 0.5;
-                transform: scale(0.8)
+                opacity: 0.4;
+                transform: scale(0.7)
             }
         }
 
-        .hstat {
-            display: flex;
-            flex-direction: column;
-            margin-left: 8px;
-        }
-
-        .hstat .v {
-            font-size: 14px;
+        .dl-btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: 700;
-            color: var(--text0);
-            line-height: 1;
-        }
-
-        .hstat .l {
-            font-size: 10px;
-            color: var(--text2);
             letter-spacing: 1px;
             text-transform: uppercase;
-            margin-top: 1px;
+            cursor: pointer;
+            background: rgba(157, 127, 240, 0.15);
+            color: var(--purple);
+            border: 1px solid rgba(157, 127, 240, 0.35);
+            text-decoration: none;
+            margin-left: 12px;
+            transition: background 0.2s;
         }
 
-        .hsep {
-            width: 1px;
-            height: 24px;
-            background: var(--border);
-            margin: 0 4px;
+        .dl-btn:hover {
+            background: rgba(157, 127, 240, 0.28)
         }
 
-        .badge {
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-
-        .badge.live {
-            background: rgba(66, 217, 138, 0.15);
-            color: var(--green);
-            border: 1px solid rgba(66, 217, 138, 0.3);
-        }
-
-        .layout {
+        /* ── LAYOUT ── */
+        .root {
             position: fixed;
-            top: 48px;
+            top: 52px;
             left: 0;
             right: 0;
             bottom: 0;
             display: grid;
-            grid-template-columns: 1fr 280px 280px;
-            grid-template-rows: 1fr 220px;
+            grid-template-columns: 260px 1fr 300px;
+            grid-template-rows: 1fr 180px;
             gap: 1px;
-            background: var(--border);
+            background: var(--b);
         }
 
         .panel {
@@ -148,621 +179,832 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 0;
+            min-height: 0
         }
 
-        .panel.span2 {
-            grid-row: span 2;
+        .panel.graph-panel {
+            grid-row: span 2
         }
 
-        .panel-header {
-            padding: 12px 16px 8px;
-            border-bottom: 1px solid var(--border);
+        .ph {
+            padding: 10px 14px 8px;
+            border-bottom: 1px solid var(--b);
             display: flex;
             align-items: center;
             gap: 8px;
-            flex-shrink: 0;
+            flex-shrink: 0
         }
 
-        .panel-title {
-            font-size: 10px;
+        .pt {
+            font-size: 9px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: var(--text2);
-            font-weight: 600;
+            color: var(--t2);
+            font-weight: 700
         }
 
-        .panel-graph {
+        .ps {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 14px;
+            min-height: 0
+        }
+
+        .ps::-webkit-scrollbar {
+            width: 2px
+        }
+
+        .ps::-webkit-scrollbar-thumb {
+            background: var(--b2);
+            border-radius: 1px
+        }
+
+        /* graph */
+        .graph-wrap {
             flex: 1;
             min-height: 0;
-            position: relative;
+            position: relative
         }
 
-        #graph-svg {
+        #gsvg {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            display: block;
+            height: 100%
         }
 
-        .panel-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 16px;
-            min-height: 0;
+        /* narrative hero */
+        .hero {
+            padding: 14px;
+            border-bottom: 1px solid var(--b)
         }
 
-        .panel-scroll::-webkit-scrollbar {
-            width: 3px;
+        .hero-line {
+            font-size: 13px;
+            color: var(--t0);
+            line-height: 1.6;
+            font-weight: 500
         }
 
-        .panel-scroll::-webkit-scrollbar-thumb {
-            background: var(--border2);
-            border-radius: 2px;
+        .hero-line span {
+            color: var(--blue)
         }
 
-        .stat-row {
+        .hero-sub {
+            font-size: 10px;
+            color: var(--t2);
+            margin-top: 4px;
+            line-height: 1.5
+        }
+
+        /* stat cards */
+        .sc-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 6px;
+            margin-bottom: 10px
         }
 
-        .stat-card {
+        .sc {
             background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 12px;
+            border: 1px solid var(--b);
+            border-radius: 7px;
+            padding: 9px 11px
         }
 
-        .stat-card .sv {
-            font-size: 20px;
+        .sc .v {
+            font-size: 18px;
             font-weight: 700;
-            color: var(--text0);
-            line-height: 1;
+            line-height: 1
         }
 
-        .stat-card .sl {
+        .sc .l {
             font-size: 9px;
-            color: var(--text2);
+            color: var(--t2);
             letter-spacing: 1px;
             text-transform: uppercase;
-            margin-top: 4px;
+            margin-top: 3px
         }
 
-        .stat-card.blue .sv {
-            color: var(--blue);
+        .sc.b .v {
+            color: var(--blue)
         }
 
-        .stat-card.green .sv {
-            color: var(--green);
+        .sc.g .v {
+            color: var(--green)
         }
 
-        .stat-card.orange .sv {
-            color: var(--orange);
+        .sc.o .v {
+            color: var(--orange)
         }
 
-        .stat-card.purple .sv {
-            color: var(--purple);
+        .sc.p .v {
+            color: var(--purple)
         }
 
-        .role-chips {
+        /* role chips */
+        .chips {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
+            gap: 5px;
+            margin: 8px 0
         }
 
         .chip {
-            padding: 4px 10px;
+            padding: 3px 9px;
             border-radius: 20px;
             font-size: 10px;
-            letter-spacing: 1px;
             font-weight: 700;
-            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-transform: uppercase
         }
 
         .chip.code {
-            background: rgba(74, 158, 255, 0.12);
-            color: var(--blue);
-            border: 1px solid rgba(74, 158, 255, 0.25);
+            background: rgba(77, 159, 255, 0.12);
+            color: var(--code);
+            border: 1px solid rgba(77, 159, 255, 0.3)
         }
 
         .chip.research {
-            background: rgba(255, 140, 66, 0.12);
-            color: var(--orange);
-            border: 1px solid rgba(255, 140, 66, 0.25);
+            background: rgba(255, 140, 58, 0.12);
+            color: var(--research);
+            border: 1px solid rgba(255, 140, 58, 0.3)
         }
 
         .chip.visual {
-            background: rgba(66, 217, 138, 0.12);
-            color: var(--green);
-            border: 1px solid rgba(66, 217, 138, 0.25);
+            background: rgba(61, 214, 140, 0.12);
+            color: var(--visual);
+            border: 1px solid rgba(61, 214, 140, 0.3)
         }
 
-        .chip.unknown {
-            background: rgba(90, 96, 112, 0.2);
-            color: var(--text1);
-            border: 1px solid var(--border);
-        }
-
-        .bar-agent {
+        /* token bars */
+        .bar {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 7px;
+            margin-bottom: 7px
         }
 
-        .bar-id {
-            width: 24px;
+        .bid {
+            width: 22px;
             font-size: 10px;
-            color: var(--text2);
+            color: var(--t2);
             text-align: right;
-            flex-shrink: 0;
+            flex-shrink: 0
         }
 
-        .bar-track {
+        .btr {
             flex: 1;
-            height: 14px;
-            background: var(--bg2);
-            border-radius: 3px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        .bar-fill {
-            height: 100%;
+            height: 12px;
+            background: var(--bg3);
             border-radius: 2px;
-            transition: width 0.4s ease;
+            overflow: hidden;
+            border: 1px solid var(--b)
         }
 
-        .bar-val {
-            width: 44px;
+        .bfill {
+            height: 100%;
+            border-radius: 1px;
+            transition: width 0.5s ease
+        }
+
+        .bval {
+            width: 42px;
             font-size: 10px;
-            color: var(--text1);
+            color: var(--t1);
             text-align: right;
-            flex-shrink: 0;
+            flex-shrink: 0
         }
 
-        .artifact-item {
+        /* event ticker */
+        .ticker {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 14px
+        }
+
+        .ticker::-webkit-scrollbar {
+            width: 2px
+        }
+
+        .ticker::-webkit-scrollbar-thumb {
+            background: var(--b2);
+            border-radius: 1px
+        }
+
+        .event {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            align-items: flex-start
+        }
+
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 3px
+        }
+
+        .event-dot.coal {
+            background: var(--purple)
+        }
+
+        .event-dot.solo {
+            background: var(--t2)
+        }
+
+        .event-dot.evo {
+            background: var(--red)
+        }
+
+        .event-dot.good {
+            background: var(--green)
+        }
+
+        .event-body {
+            flex: 1
+        }
+
+        .event-title {
+            font-size: 11px;
+            color: var(--t0);
+            line-height: 1.4
+        }
+
+        .event-meta {
+            font-size: 10px;
+            color: var(--t2);
+            margin-top: 1px
+        }
+
+        /* artifact feed */
+        .art {
             padding: 8px 10px;
-            border-radius: 6px;
+            border-radius: 5px;
             margin-bottom: 6px;
             background: var(--bg2);
-            border-left: 3px solid var(--border2);
+            border-left: 3px solid var(--b2)
         }
 
-        .artifact-item.code {
-            border-color: var(--blue);
+        .art.code {
+            border-color: var(--code)
         }
 
-        .artifact-item.research {
-            border-color: var(--orange);
+        .art.research {
+            border-color: var(--research)
         }
 
-        .artifact-item.visual {
-            border-color: var(--green);
+        .art.visual {
+            border-color: var(--visual)
         }
 
-        .artifact-top {
+        .art-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 3px;
+            margin-bottom: 2px
         }
 
-        .artifact-type {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .artifact-type.code {
-            color: var(--blue);
-        }
-
-        .artifact-type.research {
-            color: var(--orange);
-        }
-
-        .artifact-type.visual {
-            color: var(--green);
-        }
-
-        .artifact-meta {
-            font-size: 10px;
-            color: var(--text2);
-        }
-
-        .model-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-
-        .mstat {
-            background: var(--bg2);
-            border-radius: 6px;
-            padding: 8px 10px;
-            border: 1px solid var(--border);
-        }
-
-        .mstat .v {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--purple);
-        }
-
-        .mstat .l {
+        .art-type {
             font-size: 9px;
-            color: var(--text2);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
-
-        .coal-item {
-            padding: 6px 10px;
-            background: var(--bg2);
-            border-radius: 6px;
-            margin-bottom: 4px;
-            border: 1px solid rgba(167, 139, 250, 0.2);
-        }
-
-        .coal-id {
-            font-size: 10px;
-            color: var(--purple);
             font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase
         }
 
-        .coal-meta {
+        .art-type.code {
+            color: var(--code)
+        }
+
+        .art-type.research {
+            color: var(--research)
+        }
+
+        .art-type.visual {
+            color: var(--visual)
+        }
+
+        .art-meta {
             font-size: 10px;
-            color: var(--text2);
-            margin-top: 2px;
+            color: var(--t2)
         }
 
-        .no-coal {
-            font-size: 11px;
-            color: var(--text2);
-            font-style: italic;
+        /* milestones */
+        .ms {
+            padding: 6px 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            background: var(--bg3);
+            border: 1px solid var(--b);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px
         }
 
-        .loss-bar {
-            height: 4px;
-            background: var(--bg2);
+        .ms-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            flex-shrink: 0
+        }
+
+        .ms.locked .ms-dot {
+            background: var(--t2)
+        }
+
+        .ms.locked {
+            opacity: 0.4
+        }
+
+        /* loss bar */
+        .loss-wrap {
+            margin-top: 10px
+        }
+
+        .loss-track {
+            height: 3px;
+            background: var(--bg3);
             border-radius: 2px;
-            margin-top: 10px;
-            overflow: hidden;
+            margin-top: 4px;
+            overflow: hidden
         }
 
         .loss-fill {
             height: 100%;
-            border-radius: 2px;
             background: var(--purple);
-            transition: width 0.5s ease;
+            border-radius: 2px;
+            transition: width 0.5s
+        }
+
+        .loss-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3px;
+            font-size: 9px;
+            color: var(--t2)
+        }
+
+        /* coal indicator */
+        .coal-card {
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            background: var(--bg2);
+            border: 1px solid rgba(157, 127, 240, 0.25)
+        }
+
+        .coal-title {
+            font-size: 10px;
+            color: var(--purple);
+            font-weight: 700
+        }
+
+        .coal-members {
+            display: flex;
+            gap: 4px;
+            margin-top: 5px;
+            flex-wrap: wrap
+        }
+
+        .cm {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            border: 2px solid
+        }
+
+        .cm.code {
+            background: rgba(77, 159, 255, 0.15);
+            color: var(--code);
+            border-color: rgba(77, 159, 255, 0.4)
+        }
+
+        .cm.research {
+            background: rgba(255, 140, 58, 0.15);
+            color: var(--research);
+            border-color: rgba(255, 140, 58, 0.4)
+        }
+
+        .cm.visual {
+            background: rgba(61, 214, 140, 0.15);
+            color: var(--visual);
+            border-color: rgba(61, 214, 140, 0.4)
+        }
+
+        .cm.unknown {
+            background: var(--bg3);
+            color: var(--t2);
+            border-color: var(--b2)
+        }
+
+        .no-coal {
+            font-size: 11px;
+            color: var(--t2);
+            font-style: italic;
+            padding: 4px 0
+        }
+
+        /* section label */
+        .slabel {
+            font-size: 9px;
+            color: var(--t2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 10px 0 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--b)
         }
     </style>
 </head>
 
 <body>
 
-    <header>
+    <header class="hdr">
         <div class="pulse"></div>
-        <div class="logo">PANTHEON</div>
-        <div class="hsep"></div>
-        <div class="hstat">
-            <div class="v" id="h-tick">—</div>
+        <div class="hdr-logo">PANTHEON</div>
+        <div class="hdr-sub">Personal AGI Civilization · MacBook M4</div>
+        <div class="hdr-stat blue">
+            <div class="v" id="h-tick">0</div>
             <div class="l">tick</div>
         </div>
-        <div class="hsep"></div>
-        <div class="hstat">
+        <div class="hdr-stat green">
             <div class="v" id="h-quality">—</div>
             <div class="l">avg quality</div>
         </div>
-        <div class="hsep"></div>
-        <div class="hstat">
-            <div class="v" id="h-ep">—</div>
-            <div class="l">episodic</div>
+        <div class="hdr-stat orange">
+            <div class="v" id="h-ep">0</div>
+            <div class="l">memories</div>
         </div>
-        <div class="hsep"></div>
-        <div class="hstat">
-            <div class="v" id="h-nodes">—</div>
-            <div class="l">semantic nodes</div>
+        <div class="hdr-stat purple">
+            <div class="v" id="h-roles">0</div>
+            <div class="l">role clusters</div>
         </div>
-        <div style="margin-left:auto;"><span class="badge live">LIVE</span></div>
+        <a class="dl-btn" href="/paper" target="_blank">Download Paper</a>
     </header>
 
-    <div class="layout">
+    <div class="root">
 
-        <div class="panel span2">
-            <div class="panel-header">
-                <div class="panel-title">Agent Society</div>
-                <div id="graph-coalition-label" style="margin-left:auto;font-size:10px;color:var(--purple);"></div>
+        <!-- LEFT: narrative + economy -->
+        <div class="panel" style="grid-row:span 2">
+            <div class="hero" id="hero-box">
+                <div class="hero-line" id="hero-line">Waiting for society to start...</div>
+                <div class="hero-sub" id="hero-sub">—</div>
             </div>
-            <div class="panel-graph">
-                <svg id="graph-svg"></svg>
+            <div class="ph">
+                <div class="pt">Token Economy</div>
             </div>
+            <div class="ps" id="economy-bars"></div>
+            <div class="ph">
+                <div class="pt">Milestones</div>
+            </div>
+            <div class="ps" id="milestones"></div>
         </div>
 
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Society Stats</div>
+        <!-- CENTER: agent graph -->
+        <div class="panel graph-panel">
+            <div class="ph">
+                <div class="pt">Agent Society</div>
+                <div id="coal-label" style="margin-left:auto;font-size:10px;color:var(--purple);font-weight:700"></div>
             </div>
-            <div class="panel-scroll">
-                <div class="stat-row">
-                    <div class="stat-card blue">
-                        <div class="sv" id="s-tick">0</div>
-                        <div class="sl">tick</div>
-                    </div>
-                    <div class="stat-card green">
-                        <div class="sv" id="s-ep">0</div>
-                        <div class="sl">episodic</div>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-card orange">
-                        <div class="sv" id="s-nodes">0</div>
-                        <div class="sl">sem. nodes</div>
-                    </div>
-                    <div class="stat-card purple">
-                        <div class="sv" id="s-coal">0</div>
-                        <div class="sl">coalitions</div>
-                    </div>
-                </div>
-                <div
-                    style="margin-top:12px;font-size:9px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">
-                    Role clusters</div>
-                <div class="role-chips" id="role-chips"></div>
-            </div>
+            <div class="graph-wrap"><svg id="gsvg"></svg></div>
         </div>
 
+        <!-- RIGHT TOP: coalitions + model -->
         <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Society Model</div>
+            <div class="ph">
+                <div class="pt">Active Coalitions</div>
             </div>
-            <div class="panel-scroll">
-                <div class="model-grid" id="model-stats"></div>
-                <div class="loss-bar">
-                    <div class="loss-fill" id="loss-fill" style="width:0%"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:4px;">
-                    <span style="font-size:9px;color:var(--text2);">loss</span>
-                    <span id="loss-val" style="font-size:9px;color:var(--purple);">—</span>
-                </div>
-                <div
-                    style="margin-top:12px;font-size:9px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">
-                    Active coalitions</div>
+            <div class="ps">
                 <div id="coalitions"></div>
+                <div class="slabel">Society Model</div>
+                <div class="sc-grid" id="model-stats"></div>
+                <div class="loss-wrap">
+                    <div class="loss-track">
+                        <div class="loss-fill" id="loss-fill" style="width:0%"></div>
+                    </div>
+                    <div class="loss-row"><span>prediction loss</span><span id="loss-val">—</span></div>
+                </div>
             </div>
         </div>
 
+        <!-- CENTER BOTTOM: event ticker -->
         <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Token Economy</div>
+            <div class="ph">
+                <div class="pt">Live Events</div>
             </div>
-            <div class="panel-scroll" id="economy-bars"></div>
+            <div class="ticker" id="ticker"></div>
         </div>
 
+        <!-- RIGHT BOTTOM: artifact feed -->
         <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Artifact Feed</div>
+            <div class="ph">
+                <div class="pt">Artifact Feed</div>
             </div>
-            <div class="panel-scroll" id="artifact-feed"></div>
+            <div class="ps" id="artifact-feed"></div>
         </div>
 
     </div>
 
     <script>
-        const ROLE_COLOR = { code: '#4a9eff', research: '#ff8c42', visual: '#42d98a', unknown: '#5a6070' };
-        let sim, svgEl, linkSel, nodeSel;
+        const RC = { code: '#4d9fff', research: '#ff8c3a', visual: '#3dd68c', unknown: '#454d5a' };
+        let sim, svgEl, linkG, nodeG;
         let nodes = [], links = [];
-        let qualityHistory = [];
+        let qualHist = [], tickerItems = [], milestones = {};
+        let agentRoles = {};
 
-        function getGraphDims() {
-            const el = document.getElementById('graph-svg');
+        const MILESTONES = [
+            { id: 'first_coal', label: 'First coalition formed', check: d => d.active_coalitions.length > 0 || tickerItems.some(t => t.type === 'coal') },
+            { id: 'specialist', label: '3 role clusters emerged', check: d => Object.keys(d.roles || {}).length >= 3 },
+            { id: 'ep100', label: '100 memories stored', check: d => d.episodic_count >= 100 },
+            { id: 'ep500', label: '500 memories stored', check: d => d.episodic_count >= 500 },
+            { id: 'evolution', label: 'First agent evolved', check: () => tickerItems.some(t => t.type === 'evo') },
+            { id: 'nodes10', label: '10 semantic nodes distilled', check: d => d.semantic_nodes >= 10 },
+            { id: 'tick500', label: '500 ticks completed', check: d => d.tick >= 500 },
+            { id: 'paper', label: 'Society wrote its own paper', check: () => false },
+        ];
+
+        function gd() {
+            const el = document.getElementById('gsvg');
             const r = el.getBoundingClientRect();
-            return { w: r.width || 600, h: r.height || 400 };
+            return { w: r.width || 700, h: r.height || 400 };
         }
 
         function initGraph() {
-            svgEl = d3.select('#graph-svg');
-            const { w, h } = getGraphDims();
-
+            svgEl = d3.select('#gsvg');
+            const { w, h } = gd();
             sim = d3.forceSimulation()
-                .force('link', d3.forceLink().id(d => d.id).distance(80).strength(0.4))
-                .force('charge', d3.forceManyBody().strength(-200))
+                .force('link', d3.forceLink().id(d => d.id).distance(90).strength(0.5))
+                .force('charge', d3.forceManyBody().strength(-250))
                 .force('center', d3.forceCenter(w / 2, h / 2))
-                .force('collision', d3.forceCollide().radius(d => d.r + 8))
-                .force('bounds', () => {
-                    nodes.forEach(d => {
-                        d.x = Math.max(d.r + 10, Math.min(w - d.r - 10, d.x));
-                        d.y = Math.max(d.r + 10, Math.min(h - d.r - 10, d.y));
-                    });
+                .force('collision', d3.forceCollide().radius(d => d.r + 10))
+                .force('bound', () => {
+                    nodes.forEach(n => {
+                        n.x = Math.max(n.r + 16, Math.min(w - n.r - 16, n.x || w / 2));
+                        n.y = Math.max(n.r + 16, Math.min(h - n.r - 16, n.y || h / 2));
+                    })
                 });
-
-            linkSel = svgEl.append('g').attr('class', 'links');
-            nodeSel = svgEl.append('g').attr('class', 'nodes');
+            linkG = svgEl.append('g');
+            nodeG = svgEl.append('g');
         }
 
         function updateGraph(data) {
-            const { w, h } = getGraphDims();
-
+            const { w, h } = gd();
             sim.force('center', d3.forceCenter(w / 2, h / 2));
-
-            const prevPos = {};
-            nodes.forEach(n => { prevPos[n.id] = { x: n.x, y: n.y, vx: n.vx || 0, vy: n.vy || 0 }; });
-
+            agentRoles = {};
+            data.agents.forEach(a => { agentRoles[a.id] = a.role });
+            const prev = {};
+            nodes.forEach(n => { prev[n.id] = { x: n.x, y: n.y, vx: n.vx || 0, vy: n.vy || 0 } });
             nodes = data.agents.map(a => {
-                const p = prevPos[a.id] || {
-                    x: w / 2 + (Math.random() - 0.5) * 120,
-                    y: h / 2 + (Math.random() - 0.5) * 120,
-                    vx: 0, vy: 0
-                };
+                const p = prev[a.id] || { x: w / 2 + (Math.random() - .5) * 160, y: h / 2 + (Math.random() - .5) * 160, vx: 0, vy: 0 };
                 return {
                     id: a.id, role: a.role, rep: a.reputation, tok: a.tokens,
-                    r: Math.max(12, Math.min(28, 12 + a.reputation * 20)),
+                    r: Math.max(14, Math.min(30, 14 + a.reputation * 22)),
                     x: p.x, y: p.y, vx: p.vx, vy: p.vy
                 };
             });
-
             links = [];
             data.active_coalitions.forEach(c => {
                 const m = c.members || [];
-                for (let i = 0; i < m.length - 1; i++)
-                    links.push({ source: m[i], target: m[i + 1] });
+                for (let i = 0; i < m.length - 1; i++) links.push({ source: m[i], target: m[i + 1] });
             });
 
-            linkSel.selectAll('line').data(links, d => `${d.source}-${d.target}`)
+            linkG.selectAll('line').data(links, d => `${d.source}-${d.target}`)
                 .join(
-                    e => e.append('line').attr('stroke', 'rgba(167,139,250,0.4)')
-                        .attr('stroke-width', 2).attr('stroke-dasharray', '5,3'),
-                    u => u,
-                    x => x.remove()
+                    e => e.append('line').attr('stroke', 'rgba(157,127,240,0.5)')
+                        .attr('stroke-width', 2.5).attr('stroke-dasharray', '6,3'),
+                    u => u, x => x.remove()
                 );
 
-            const ng = nodeSel.selectAll('g.agent').data(nodes, d => d.id)
+            const ng = nodeG.selectAll('g.ag').data(nodes, d => d.id)
                 .join(
-                    enter => {
-                        const g = enter.append('g').attr('class', 'agent').style('cursor', 'pointer');
-                        g.append('circle').attr('class', 'ring').attr('fill', 'none')
-                            .attr('stroke-width', 1.5).attr('stroke-dasharray', '3,3').attr('opacity', 0.3);
+                    e => {
+                        const g = e.append('g').attr('class', 'ag').style('cursor', 'grab');
+                        g.append('circle').attr('class', 'aura').attr('fill', 'none').attr('stroke-width', 2);
                         g.append('circle').attr('class', 'body');
-                        g.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em')
-                            .attr('fill', 'rgba(255,255,255,0.95)').style('pointer-events', 'none')
-                            .style('font-family', 'monospace').style('font-weight', '700').style('font-size', '10px');
+                        g.append('text').attr('text-anchor', 'middle').attr('dy', '0.38em')
+                            .attr('fill', '#fff').style('pointer-events', 'none')
+                            .style('font-family', 'monospace').style('font-weight', '800');
+                        g.append('text').attr('class', 'role-label').attr('text-anchor', 'middle')
+                            .attr('fill', 'rgba(255,255,255,0.45)').style('pointer-events', 'none')
+                            .style('font-family', 'monospace').style('font-weight', '600');
                         return g;
                     },
                     u => u, x => x.remove()
                 );
 
-            ng.select('circle.ring')
-                .attr('r', d => d.r + 6)
-                .attr('stroke', d => ROLE_COLOR[d.role] || '#5a6070')
-                .attr('opacity', d => d.rep > 0.5 ? 0.45 : 0.15);
+            ng.select('.aura')
+                .attr('r', d => d.r + 8)
+                .attr('stroke', d => RC[d.role] || RC.unknown)
+                .attr('stroke-dasharray', '4,4')
+                .attr('opacity', d => Math.min(0.6, 0.1 + d.rep * 0.6));
 
-            ng.select('circle.body')
+            ng.select('.body')
                 .attr('r', d => d.r)
-                .attr('fill', d => ROLE_COLOR[d.role] || '#5a6070')
-                .attr('fill-opacity', 0.88)
-                .attr('stroke', d => ROLE_COLOR[d.role] || '#5a6070')
-                .attr('stroke-width', 1.5).attr('stroke-opacity', 0.5);
+                .attr('fill', d => RC[d.role] || RC.unknown)
+                .attr('fill-opacity', 0.9)
+                .attr('stroke', d => RC[d.role] || RC.unknown)
+                .attr('stroke-width', 2).attr('stroke-opacity', 0.6);
 
-            ng.select('text').text(d => `A${d.id}`);
+            ng.select('text:not(.role-label)')
+                .attr('font-size', d => d.r < 18 ? 9 : 11)
+                .text(d => `A${d.id}`);
+
+            ng.select('.role-label')
+                .attr('dy', d => d.r + 14)
+                .attr('font-size', 8)
+                .text(d => d.role === 'unknown' ? '' : d.role.slice(0, 3).toUpperCase());
 
             ng.call(d3.drag()
-                .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
-                .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
-                .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+                .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y })
+                .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y })
+                .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null })
             );
 
             sim.nodes(nodes).on('tick', () => {
-                linkSel.selectAll('line')
+                linkG.selectAll('line')
                     .attr('x1', d => typeof d.source === 'object' ? d.source.x : 0)
                     .attr('y1', d => typeof d.source === 'object' ? d.source.y : 0)
                     .attr('x2', d => typeof d.target === 'object' ? d.target.x : 0)
                     .attr('y2', d => typeof d.target === 'object' ? d.target.y : 0);
-                nodeSel.selectAll('g.agent').attr('transform', d => `translate(${d.x},${d.y})`);
+                nodeG.selectAll('g.ag').attr('transform', d => `translate(${d.x || 0},${d.y || 0})`);
             });
             sim.force('link').links(links);
-            sim.alpha(0.2).restart();
+            sim.alpha(0.15).restart();
 
-            const coal = data.active_coalitions;
-            document.getElementById('graph-coalition-label').textContent =
-                coal.length ? `${coal.length} coalition${coal.length > 1 ? 's' : ''} active` : '';
+            const cl = data.active_coalitions;
+            document.getElementById('coal-label').textContent =
+                cl.length ? `${cl.length} coalition${cl.length > 1 ? 's' : ''} forming` : '';
+        }
+
+        function updateHero(data) {
+            const roles = data.roles || {};
+            const nRoles = Object.keys(roles).length;
+            const nAgents = data.agents.length;
+            const ep = data.episodic_count;
+            const coal = data.active_coalitions.length;
+
+            let line = '', sub = '';
+            if (nRoles >= 3) {
+                line = `<span>${nAgents} identical agents</span> evolved into <span>${nRoles} specialist roles</span>`;
+                sub = `${roles.code || 0} coders · ${roles.research || 0} researchers · ${roles.visual || 0} visualizers — nobody assigned these roles`;
+            } else if (nRoles >= 2) {
+                line = `<span>${nAgents} agents</span> are beginning to specialise`;
+                sub = `Role clusters emerging from task exposure — no labels, no assignments`;
+            } else {
+                line = `<span>${nAgents} identical agents</span> exploring the task space`;
+                sub = `Tick ${data.tick} — specialisation emerging soon`;
+            }
+            if (coal > 0) sub += ` · ${coal} coalition${coal > 1 ? 's' : ''} active right now`;
+            document.getElementById('hero-line').innerHTML = line;
+            document.getElementById('hero-sub').textContent = sub;
+            document.getElementById('h-roles').textContent = nRoles;
         }
 
         function updateHeader(data) {
             document.getElementById('h-tick').textContent = data.tick;
             document.getElementById('h-ep').textContent = data.episodic_count;
-            document.getElementById('h-nodes').textContent = data.semantic_nodes;
-            if (qualityHistory.length > 0) {
-                const avg = qualityHistory.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, qualityHistory.length);
+            if (qualHist.length > 0) {
+                const avg = qualHist.slice(-30).reduce((a, b) => a + b, 0) / Math.min(30, qualHist.length);
                 document.getElementById('h-quality').textContent = avg.toFixed(3);
             }
         }
 
-        function updateStats(data) {
-            document.getElementById('s-tick').textContent = data.tick;
-            document.getElementById('s-ep').textContent = data.episodic_count;
-            document.getElementById('s-nodes').textContent = data.semantic_nodes;
-            document.getElementById('s-coal').textContent = data.active_coalitions.length;
-            const roles = data.roles || {};
-            document.getElementById('role-chips').innerHTML = Object.entries(roles)
-                .map(([r, c]) => `<div class="chip ${r}">${r} <span style="opacity:0.6">${c}</span></div>`).join('');
-        }
-
         function updateEconomy(data) {
-            const maxTok = Math.max(...data.agents.map(a => a.tokens), 1);
+            const max = Math.max(...data.agents.map(a => a.tokens), 1);
             document.getElementById('economy-bars').innerHTML = data.agents.map(a => {
-                const pct = ((a.tokens / maxTok) * 100).toFixed(1);
-                const col = ROLE_COLOR[a.role] || '#5a6070';
-                return `<div class="bar-agent">
-      <div class="bar-id">A${a.id}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${col};opacity:0.8"></div></div>
-      <div class="bar-val">${a.tokens}</div>
+                const pct = ((a.tokens / max) * 100).toFixed(1);
+                const col = RC[a.role] || RC.unknown;
+                return `<div class="bar">
+      <div class="bid">A${a.id}</div>
+      <div class="btr"><div class="bfill" style="width:${pct}%;background:${col};opacity:0.85"></div></div>
+      <div class="bval">${a.tokens}</div>
     </div>`;
             }).join('');
         }
 
-        function updateArtifacts(data) {
-            const arts = [...(data.recent_artifacts || [])].reverse();
-            document.getElementById('artifact-feed').innerHTML = arts.map(a => {
-                const qColor = a.quality >= 0.8 ? 'var(--green)' : a.quality >= 0.5 ? 'var(--yellow)' : 'var(--red)';
-                const detail = a.mode === 'COALITION'
-                    ? `coalition ${(a.coalition_id || '').slice(0, 8)}`
-                    : `agent ${a.agent_id}`;
-                return `<div class="artifact-item ${a.type}">
-      <div class="artifact-top">
-        <span class="artifact-type ${a.type}">${a.type}</span>
-        <span style="font-size:11px;font-weight:700;color:${qColor}">${(a.quality || 0).toFixed(3)}</span>
-      </div>
-      <div class="artifact-meta">tick ${a.tick} · ${a.mode} · ${detail}</div>
-    </div>`;
-            }).join('');
-            if (arts.length && arts[0].quality) qualityHistory.push(arts[0].quality);
+        function updateCoalitions(data) {
+            const coal = data.active_coalitions || [];
+            document.getElementById('coalitions').innerHTML = coal.length
+                ? coal.map(c => {
+                    const members = (c.members || []).map(id => {
+                        const role = agentRoles[id] || 'unknown';
+                        return `<div class="cm ${role}" title="${role}">A${id}</div>`;
+                    }).join('');
+                    return `<div class="coal-card">
+        <div class="coal-title">${(c.coalition_id || '').slice(0, 10)} · ${c.task_type || ''}</div>
+        <div class="coal-meta" style="font-size:9px;color:var(--t2);margin-top:2px">coord: A${c.coordinator}</div>
+        <div class="coal-members">${members}</div>
+      </div>`;
+                }).join('')
+                : '<div class="no-coal">no active coalitions</div>';
         }
 
         function updateModel(data) {
             const m = data.society_model || {};
             document.getElementById('model-stats').innerHTML = [
-                { v: m.train_steps || 0, l: 'train steps' },
-                { v: m.window_size || 0, l: 'event window' },
-                { v: m.total_curiosity || 0, l: 'curiosity tokens' },
-                { v: data.episodic_count || 0, l: 'episodic records' },
-            ].map(x => `<div class="mstat"><div class="v">${x.v}</div><div class="l">${x.l}</div></div>`).join('');
-
+                { v: m.train_steps || 0, l: 'train steps', cls: 'p' },
+                { v: m.total_curiosity || 0, l: 'curiosity tokens', cls: 'b' },
+            ].map(x => `<div class="sc ${x.cls}"><div class="v">${x.v}</div><div class="l">${x.l}</div></div>`).join('');
             const loss = m.avg_loss || 0;
             document.getElementById('loss-fill').style.width = Math.min(100, (loss / 3) * 100).toFixed(1) + '%';
             document.getElementById('loss-val').textContent = loss.toFixed ? loss.toFixed(3) : loss;
-
-            const coal = data.active_coalitions || [];
-            document.getElementById('coalitions').innerHTML = coal.length
-                ? coal.map(c => `<div class="coal-item">
-        <div class="coal-id">${(c.coalition_id || '').slice(0, 12)}</div>
-        <div class="coal-meta">members: [${(c.members || []).join(', ')}] · coord: ${c.coordinator} · ${c.task_type}</div>
-      </div>`).join('')
-                : '<div class="no-coal">no active coalitions</div>';
         }
 
+        function addEvent(type, title, meta) {
+            tickerItems.unshift({ type, title, meta, t: Date.now() });
+            if (tickerItems.length > 40) tickerItems = tickerItems.slice(0, 40);
+            document.getElementById('ticker').innerHTML = tickerItems.map(ev => `
+    <div class="event">
+      <div class="event-dot ${ev.type}"></div>
+      <div class="event-body">
+        <div class="event-title">${ev.title}</div>
+        <div class="event-meta">${ev.meta}</div>
+      </div>
+    </div>`).join('');
+        }
+
+        function updateArtifacts(data) {
+            const arts = [...(data.recent_artifacts || [])].reverse();
+            if (arts.length && arts[0].quality) qualHist.push(arts[0].quality);
+            document.getElementById('artifact-feed').innerHTML = arts.map(a => {
+                const qc = a.quality >= 0.8 ? 'var(--green)' : a.quality >= 0.5 ? 'var(--yellow)' : 'var(--red)';
+                const who = a.mode === 'COALITION' ? `coalition` : `agent A${a.agent_id}`;
+                return `<div class="art ${a.type}">
+      <div class="art-top">
+        <span class="art-type ${a.type}">${a.type}</span>
+        <span style="font-size:11px;font-weight:700;color:${qc}">${(a.quality || 0).toFixed(3)}</span>
+      </div>
+      <div class="art-meta">tick ${a.tick} · ${who}</div>
+    </div>`;
+            }).join('');
+        }
+
+        function updateMilestones(data) {
+            MILESTONES.forEach(m => {
+                if (!milestones[m.id] && m.check(data)) {
+                    milestones[m.id] = true;
+                    addEvent('good', `Milestone: ${m.label}`, 'Achievement unlocked');
+                }
+            });
+            document.getElementById('milestones').innerHTML = MILESTONES.map(m => `
+    <div class="ms ${milestones[m.id] ? '' : 'locked'}">
+      <div class="ms-dot"></div>
+      <span style="color:${milestones[m.id] ? 'var(--t0)' : 'var(--t2)'}">${m.label}</span>
+    </div>`).join('');
+        }
+
+        let lastTick = -1, lastCoalCount = 0;
         function render(data) {
             updateHeader(data);
+            updateHero(data);
             updateGraph(data);
-            updateStats(data);
             updateEconomy(data);
-            updateArtifacts(data);
+            updateCoalitions(data);
             updateModel(data);
+            updateArtifacts(data);
+            updateMilestones(data);
+
+            if (data.tick !== lastTick) {
+                lastTick = data.tick;
+                const arts = data.recent_artifacts || [];
+                if (arts.length) {
+                    const a = arts[arts.length - 1];
+                    if (a.mode === 'COALITION') {
+                        addEvent('coal',
+                            `Coalition produced ${a.type} artifact`,
+                            `Quality ${(a.quality || 0).toFixed(3)} · ${(data.active_coalitions[0]?.members || []).map(i => 'A' + i).join(', ')}`
+                        );
+                    }
+                }
+            }
+            if (data.active_coalitions.length > lastCoalCount && data.active_coalitions.length > 0) {
+                const c = data.active_coalitions[0];
+                addEvent('coal',
+                    `New coalition forming — ${c.task_type} task`,
+                    `Members: ${(c.members || []).map(i => 'A' + i).join(', ')} · coordinator A${c.coordinator}`
+                );
+            }
+            lastCoalCount = data.active_coalitions.length;
         }
 
         window.addEventListener('load', () => {
             initGraph();
+            addEvent('solo', 'Society starting up', 'Agents initialising with identical fingerprints');
             const ws = new WebSocket(`ws://${location.host}/ws/society`);
             ws.onmessage = e => render(JSON.parse(e.data));
             ws.onclose = () => {
                 document.querySelector('.pulse').style.background = 'var(--red)';
-                document.querySelector('.badge.live').textContent = 'OFFLINE';
+                addEvent('evo', 'Connection lost', 'Reconnect to resume');
             };
         });
     </script>
