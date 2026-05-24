@@ -202,6 +202,12 @@ KEYWORD_MAP = {
 
 class CoherenceScorer:
     def score(self, hypothesis: dict) -> float:
+        try:
+            from output.llm_backend import score_coherence, available
+            if available():
+                return score_coherence(hypothesis)
+        except Exception:
+            pass
         score = 0.0
         if all(f in hypothesis for f in REQUIRED_FIELDS):
             score += 0.25
@@ -251,7 +257,23 @@ class ResearchOutputLayer:
                 coalition_id  : Optional[str] = None,
                 custom_hyp    : Optional[dict] = None,
                 difficulty    : float = 0.5) -> ResearchArtifact:
-        hypothesis = custom_hyp or self.select_template(task_desc)
+        if custom_hyp:
+            hypothesis = custom_hyp
+        else:
+            try:
+                from output.llm_backend import generate_hypothesis, available
+                import json
+                if available():
+                    raw = generate_hypothesis(task_desc, max_tokens=300)
+                    parsed = json.loads(raw) if raw else {}
+                    if parsed.get("claim") and parsed.get("experiment"):
+                        hypothesis = parsed
+                    else:
+                        hypothesis = self.select_template(task_desc)
+                else:
+                    hypothesis = self.select_template(task_desc)
+            except Exception:
+                hypothesis = self.select_template(task_desc)
         raw_text   = json.dumps(hypothesis, indent=2)
         base_score = self.scorer.score(hypothesis)
 
