@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/recharts@2.8.0/umd/Recharts.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
@@ -167,7 +167,7 @@
 
                     simRef.current = d3.forceSimulation()
                         .force('link', d3.forceLink().id(d => d.id).distance(85).strength(0.5))
-                        .force('charge', d3.forceManyBody().strength(-320))
+                        .force('charge', d3.forceManyBody().strength(-260))
                         .force('center', d3.forceCenter(w / 2, h / 2))
                         .force('collision', d3.forceCollide().radius(d => d.r + 14))
                         .force('bound', () => {
@@ -270,22 +270,22 @@
         // ── QUALITY CHART ──────────────────────────────────────────────────────────
 
         function QualityChart({ history }) {
-            const data = history.slice(-60).map((v, i) => ({ i, q: v }));
-            return React.createElement(ResponsiveContainer, { width: '100%', height: 60 },
-                React.createElement(AreaChart, { data, margin: { top: 4, right: 0, bottom: 0, left: 0 } },
-                    React.createElement('defs', null,
-                        React.createElement('linearGradient', { id: 'qg', x1: '0', y1: '0', x2: '0', y2: '1' },
-                            React.createElement('stop', { offset: '5%', stopColor: '#5b8def', stopOpacity: 0.3 }),
-                            React.createElement('stop', { offset: '95%', stopColor: '#5b8def', stopOpacity: 0 })
-                        )
-                    ),
-                    React.createElement(XAxis, { dataKey: 'i', hide: true }),
-                    React.createElement(YAxis, { domain: [0, 1], hide: true }),
-                    React.createElement(Area, {
-                        type: 'monotone', dataKey: 'q', stroke: '#5b8def',
-                        strokeWidth: 1.5, fill: 'url(#qg)', dot: false, isAnimationActive: false
-                    })
-                )
+            const h = history.slice(-60);
+            if (h.length < 2) return React.createElement('div', { style: { height: 60 } });
+            const w = 240, ht = 60, pad = 4;
+            const xs = h.map((_, i) => pad + (i / (h.length - 1)) * (w - pad * 2));
+            const ys = h.map(v => ht - pad - v * (ht - pad * 2));
+            const line = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x},${ys[i]}`).join(' ');
+            const area = line + ` L${xs[xs.length-1]},${ht-pad} L${xs[0]},${ht-pad} Z`;
+            return React.createElement('svg', { width: '100%', height: 60, viewBox: `0 0 ${w} ${ht}`, preserveAspectRatio: 'none' },
+                React.createElement('defs', null,
+                    React.createElement('linearGradient', { id: 'qg', x1: '0', y1: '0', x2: '0', y2: '1' },
+                        React.createElement('stop', { offset: '5%', stopColor: '#5b8def', stopOpacity: 0.3 }),
+                        React.createElement('stop', { offset: '95%', stopColor: '#5b8def', stopOpacity: 0 })
+                    )
+                ),
+                React.createElement('path', { d: area, fill: 'url(#qg)' }),
+                React.createElement('path', { d: line, fill: 'none', stroke: '#5b8def', strokeWidth: 1.5 })
             );
         }
 
