@@ -47,6 +47,8 @@ def generate_code(task_desc: str, max_tokens: int = MAX_TOKENS) -> str:
         try:
             out = generate(_model, _tokenizer, prompt=prompt,
                            max_tokens=max_tokens, verbose=False)
+            if '<|end|>' in out:
+                out = out[:out.index('<|end|>')]
             return _clean_code(out)
         except Exception:
             return ""
@@ -125,13 +127,21 @@ def _mock_score(hypothesis: dict) -> float:
 
 
 def _clean_code(raw: str) -> str:
+    for stop in ['<|end|>', '<|endoftext|>', '<|assistant|>', '```']:
+        if stop in raw:
+            raw = raw[:raw.index(stop)]
     raw = re.sub(r'```python\s*', '', raw)
-    raw = re.sub(r'```\s*', '', raw)
     raw = raw.strip()
     if not raw.startswith('def ') and 'def ' in raw:
         idx = raw.index('def ')
         raw = raw[idx:]
-    return raw
+    lines = raw.split('\n')
+    clean = []
+    for line in lines:
+        if line.strip().startswith('<|'):
+            break
+        clean.append(line)
+    return '\n'.join(clean).strip()
 
 
 def _clean_json(raw: str) -> str:
