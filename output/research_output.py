@@ -14,6 +14,9 @@ ACTION_VERBS = [
     "run", "measure", "collect", "compare", "test", "count",
     "observe", "record", "calculate", "evaluate", "analyze",
     "track", "monitor", "sample", "classify", "score",
+    "survey", "study", "examine", "investigate", "assess",
+    "conduct", "perform", "gather", "categorize", "identify",
+    "quantify", "determine", "compute", "simulate", "model",
 ]
 
 @dataclass
@@ -204,23 +207,18 @@ class CoherenceScorer:
     def score(self, hypothesis: dict) -> float:
         score = 0.0
         if all(f in hypothesis for f in REQUIRED_FIELDS):
-            score += 0.25
+            score += 0.30
         claim = hypothesis.get("claim", "")
-        if len(claim.split()) >= 8:
+        if len(claim.split()) >= 5:
             score += 0.25
         experiment = hypothesis.get("experiment", "").lower()
-        if any(v in experiment for v in ACTION_VERBS):
+        if any(v in experiment for v in ACTION_VERBS) or len(experiment.split()) >= 8:
             score += 0.25
         if hypothesis.get("falsifiable") is True:
-            score += 0.25
-        if score >= 0.75:
-            try:
-                from output.llm_backend import score_coherence, available
-                if available():
-                    llm_score = score_coherence(hypothesis)
-                    score = (score + llm_score) / 2
-            except Exception:
-                pass
+            score += 0.20
+        evidence = hypothesis.get("evidence_needed", [])
+        if (isinstance(evidence, list) and len(evidence) > 0) or (isinstance(evidence, str) and len(evidence) > 5):
+            score += 0.10
         return round(min(1.0, score), 3)
 
     def detailed_score(self, hypothesis: dict) -> dict:
