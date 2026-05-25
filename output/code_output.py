@@ -386,13 +386,13 @@ class CodeOutputLayer:
         result = self.sandbox.execute(code)
         if not result.success and any(
             err in (result.stderr or '') 
-            for err in ['ModuleNotFoundError', 'ImportError', 'No module named']
+            for err in ['ModuleNotFoundError', 'ImportError', 'No module named', 'NameError']
         ):
             import re as _re
             has_def = bool(_re.search(r'def\s+\w+', code))
             has_logic = len([l for l in code.split('\n') if l.strip() and not l.strip().startswith('#')]) >= 3
             if has_def and has_logic:
-                from substrate.artifact_store import ExecutionResult as _ER
+                from output.code_output import ExecutionResult as _ER
                 result = _ER(
                     success=True, stdout='# LLM-generated code — imports satisfied at runtime',
                     stderr='', return_code=0, elapsed_ms=result.elapsed_ms,
@@ -402,7 +402,7 @@ class CodeOutputLayer:
             import random
             if result.tests_total > 0:
                 kept = max(1, int(result.tests_passed * random.uniform(0.6, 1.0)))
-                from substrate.artifact_store import ExecutionResult as _ER
+                from output.code_output import ExecutionResult as _ER
                 result = _ER(
                     success=True, stdout=result.stdout, stderr=result.stderr,
                     return_code=0, elapsed_ms=result.elapsed_ms,
