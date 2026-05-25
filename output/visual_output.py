@@ -294,7 +294,7 @@ class VisualOutputLayer:
             try:
                 from output.llm_backend import generate_visual, available
                 if available():
-                    llm_vis = generate_visual(task_desc, max_tokens=200)
+                    llm_vis = generate_visual(task_desc, max_tokens=200, difficulty=difficulty)
                     content = llm_vis if llm_vis and len(llm_vis) > 10 else template["generator"](ctx)
                 else:
                     content = template["generator"](ctx)

@@ -264,7 +264,7 @@ class ResearchOutputLayer:
                 from output.llm_backend import generate_hypothesis, available
                 import json
                 if available():
-                    raw = generate_hypothesis(task_desc, max_tokens=300)
+                    raw = generate_hypothesis(task_desc, max_tokens=300, difficulty=difficulty)
                     parsed = json.loads(raw) if raw else {}
                     if parsed.get("claim") and parsed.get("experiment"):
                         hypothesis = parsed

@@ -33,13 +33,16 @@ def available() -> bool:
     return _load()
 
 
-def generate_code(task_desc: str, max_tokens: int = MAX_TOKENS) -> str:
+def generate_code(task_desc: str, max_tokens: int = MAX_TOKENS, difficulty: float = 1.0) -> str:
+    if difficulty < 0.75:
+        return ""
     if not _load():
         return ""
     from mlx_lm import generate
     prompt = (
-        f"<|system|>You are an expert Python programmer. Write clean, working Python code only. "
-        f"No explanation, no markdown, no comments. Just the function.<|end|>\n"
+        f"<|system|>You are an expert Python programmer. Write a single clean Python function. "
+        f"Only use standard library imports: os, sys, re, json, urllib.request, urllib.parse, html.parser. "
+        f"No third party libraries. No explanation. Return only the function definition.<|end|>\n"
         f"<|user|>Write Python code for this task: {task_desc}<|end|>\n"
         f"<|assistant|>"
     )
@@ -54,7 +57,9 @@ def generate_code(task_desc: str, max_tokens: int = MAX_TOKENS) -> str:
             return ""
 
 
-def generate_hypothesis(task_desc: str, max_tokens: int = MAX_TOKENS) -> str:
+def generate_hypothesis(task_desc: str, max_tokens: int = MAX_TOKENS, difficulty: float = 1.0) -> str:
+    if difficulty < 0.75:
+        return ""
     if not _load():
         return ""
     from mlx_lm import generate
@@ -74,7 +79,9 @@ def generate_hypothesis(task_desc: str, max_tokens: int = MAX_TOKENS) -> str:
             return ""
 
 
-def generate_visual(task_desc: str, max_tokens: int = MAX_TOKENS) -> str:
+def generate_visual(task_desc: str, max_tokens: int = MAX_TOKENS, difficulty: float = 1.0) -> str:
+    if difficulty < 0.75:
+        return ""
     if not _load():
         return ""
     from mlx_lm import generate

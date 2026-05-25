@@ -376,7 +376,7 @@ class CodeOutputLayer:
             try:
                 from output.llm_backend import generate_code, available
                 if available():
-                    llm_code = generate_code(task_desc, max_tokens=300)
+                    llm_code = generate_code(task_desc, max_tokens=300, difficulty=difficulty)
                     code = llm_code if llm_code and len(llm_code) > 20 else self.select_template(task_desc)
                 else:
                     code = self.select_template(task_desc)
