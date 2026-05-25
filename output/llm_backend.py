@@ -145,14 +145,27 @@ def _clean_code(raw: str) -> str:
 
 
 def _clean_json(raw: str) -> str:
+    for stop in ['<|end|>', '<|endoftext|>', '<|assistant|>']:
+        if stop in raw:
+            raw = raw[:raw.index(stop)]
     raw = re.sub(r'```json\s*', '', raw)
     raw = re.sub(r'```\s*', '', raw)
     raw = raw.strip()
     start = raw.find('{')
     end   = raw.rfind('}')
     if start != -1 and end != -1:
-        return raw[start:end+1]
-    return raw
+        raw = raw[start:end+1]
+    try:
+        import json
+        parsed = json.loads(raw)
+        if isinstance(parsed.get('falsifiable'), str):
+            fs = parsed['falsifiable'].lower()
+            parsed['falsifiable'] = fs not in ('false', 'no', '0', '')
+        if isinstance(parsed.get('evidence_needed'), str):
+            parsed['evidence_needed'] = [parsed['evidence_needed']]
+        return json.dumps(parsed)
+    except Exception:
+        return raw
 
 
 if __name__ == "__main__":
