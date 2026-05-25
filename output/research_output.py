@@ -202,12 +202,6 @@ KEYWORD_MAP = {
 
 class CoherenceScorer:
     def score(self, hypothesis: dict) -> float:
-        try:
-            from output.llm_backend import score_coherence, available
-            if available():
-                return score_coherence(hypothesis)
-        except Exception:
-            pass
         score = 0.0
         if all(f in hypothesis for f in REQUIRED_FIELDS):
             score += 0.25
@@ -219,7 +213,15 @@ class CoherenceScorer:
             score += 0.25
         if hypothesis.get("falsifiable") is True:
             score += 0.25
-        return round(score, 3)
+        if score >= 0.75:
+            try:
+                from output.llm_backend import score_coherence, available
+                if available():
+                    llm_score = score_coherence(hypothesis)
+                    score = (score + llm_score) / 2
+            except Exception:
+                pass
+        return round(min(1.0, score), 3)
 
     def detailed_score(self, hypothesis: dict) -> dict:
         fields_ok  = all(f in hypothesis for f in REQUIRED_FIELDS)
