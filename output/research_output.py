@@ -211,7 +211,8 @@ class CoherenceScorer:
         claim = hypothesis.get("claim", "")
         if len(claim.split()) >= 5:
             score += 0.25
-        experiment = hypothesis.get("experiment", "").lower()
+        experiment = hypothesis.get("experiment", "")
+        experiment = (experiment if isinstance(experiment, str) else " ".join(experiment) if isinstance(experiment, list) else "").lower()
         if any(v in experiment for v in ACTION_VERBS) or len(experiment.split()) >= 8:
             score += 0.25
         if hypothesis.get("falsifiable") is True:

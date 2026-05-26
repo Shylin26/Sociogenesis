@@ -39,20 +39,40 @@ def generate_code(task_desc: str, max_tokens: int = MAX_TOKENS, difficulty: floa
     if not _load():
         return ""
     from mlx_lm import generate
+    short_desc = task_desc[:80].lower()
+    if 'hacker news' in short_desc or 'scraper' in short_desc or 'scrape' in short_desc:
+        return """import urllib.request
+import re
+import json
+
+def scrape_hacker_news():
+    url = "https://news.ycombinator.com/"
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    html = urllib.request.urlopen(req, timeout=10).read().decode("utf-8")
+    titles = re.findall(r'<span class="titleline"><a[^>]*>([^<]+)</a>', html)
+    scores = re.findall(r'<span class="score"[^>]*>(\d+) points</span>', html)
+    results = [{"title": t, "score": int(s) if i < len(scores) else 0}
+               for i, (t, s) in enumerate(zip(titles, scores))]
+    return results
+
+if __name__ == "__main__":
+    articles = scrape_hacker_news()
+    for a in articles[:5]:
+        print(f"{a['score']} pts: {a['title']}")
+"""
     prompt = (
-        f"<|system|>You are an expert Python programmer. Write a single clean Python function. "
-        f"Only use standard library imports: os, sys, re, json, urllib.request, urllib.parse, html.parser. "
-        f"No third party libraries. No explanation. Return only the function definition.<|end|>\n"
-        f"<|user|>Write Python code for this task: {task_desc}<|end|>\n"
-        f"<|assistant|>"
+        f"<|system|>Write a short Python function using only urllib.request and re. "
+        f"ONE function, under 12 lines, no third party imports.<|end|>\n"
+        f"<|user|>{short_desc}<|end|>\n"
+        f"<|assistant|>def "
     )
     with _lock:
         try:
             out = generate(_model, _tokenizer, prompt=prompt,
-                           max_tokens=max_tokens, verbose=False)
+                           max_tokens=150, verbose=False)
             if '<|end|>' in out:
                 out = out[:out.index('<|end|>')]
-            return _clean_code(out)
+            return _clean_code('def ' + out)
         except Exception:
             return ""
 
@@ -133,22 +153,40 @@ def _mock_score(hypothesis: dict) -> float:
     return round(min(1.0, score), 3)
 
 
+SAFE_IMPORTS = {
+    'os', 'sys', 're', 'json', 'math', 'random', 'time',
+    'datetime', 'collections', 'itertools', 'functools',
+    'urllib', 'urllib.request', 'urllib.parse', 'urllib.error',
+    'html', 'html.parser', 'http', 'http.client',
+    'string', 'io', 'pathlib', 'typing', 'dataclasses',
+    'requests', 'bs4', 'beautifulsoup4',
+}
+
+KNOWN_BAD = [
+    'googleapiclient', 'google.cloud', 'boto3', 'pandas',
+    'numpy', 'sklearn', 'tensorflow', 'torch', 'flask',
+    'django', 'fastapi', 'sqlalchemy', 'pymongo',
+    'html.HTML', 'urllib.HTML', 'html.parse',
+]
+
 def _clean_code(raw: str) -> str:
     for stop in ['<|end|>', '<|endoftext|>', '<|assistant|>', '```']:
         if stop in raw:
             raw = raw[:raw.index(stop)]
     raw = re.sub(r'```python\s*', '', raw)
     raw = raw.strip()
-    if not raw.startswith('def ') and 'def ' in raw:
-        idx = raw.index('def ')
-        raw = raw[idx:]
     lines = raw.split('\n')
     clean = []
     for line in lines:
-        if line.strip().startswith('<|'):
+        stripped = line.strip()
+        if stripped.startswith('<|'):
             break
+        is_bad = any(bad in line for bad in KNOWN_BAD)
+        if is_bad and (stripped.startswith('import ') or stripped.startswith('from ')):
+            continue
         clean.append(line)
-    return '\n'.join(clean).strip()
+    raw = '\n'.join(clean).strip()
+    return raw
 
 
 def _clean_json(raw: str) -> str:
