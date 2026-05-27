@@ -211,16 +211,20 @@ class OutputRouter:
     def _produce_visual(self, agent_id: int, task_desc: str,
                          tick: int, coalition_id: str,
                          context: dict, difficulty: float = 0.5) -> VisualArtifact:
+        from output.visual_output import extract_components
+        task_components, task_title = extract_components(task_desc)
         visual_context = {
-            "title": context.get("title", "System Architecture"),
+            "title": context.get("title", task_title),
+            "components": task_components,
+            "task_desc": task_desc,
         }
         if context.get("code_fn_name"):
-            fn  = context["code_fn_name"]
+            fn = context["code_fn_name"]
             visual_context["components"] = [
                 "HTTP Request",
                 f"{fn}(url)",
-                "Parser / Extractor",
-                f"{fn}_results",
+                "HTML Parser",
+                f"{fn}_results [ ]",
                 "Topic Classifier",
                 "Output Chart",
             ]
