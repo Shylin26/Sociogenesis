@@ -35,21 +35,67 @@ class VisualArtifact:
 
 def make_data_flow_diagram(components: list[str],
                            title: str = "Data Flow") -> str:
-    """Generate an ASCII data flow diagram."""
-    lines = [
-        f"┌{'─' * (len(title) + 2)}┐",
-        f"│ {title} │",
-        f"└{'─' * (len(title) + 2)}┘",
-        "",
-    ]
+    max_len  = max((len(c) for c in components), default=20)
+    box_w    = max(25, max_len + 4)
+    pad      = box_w - 2
+    lines    = []
+    tlen     = len(title) + 2
+    lines.append(f"  ┌{'─' * tlen}┐")
+    lines.append(f"  │ {title} │")
+    lines.append(f"  └{'─' * tlen}┘")
+    lines.append(f"       │")
+    lines.append(f"       ▼")
     for i, comp in enumerate(components):
-        lines.append(f"  ┌─────────────────────────┐")
-        lines.append(f"  │  {comp:<23s}│")
-        lines.append(f"  └─────────────────────────┘")
+        label = comp[:pad-2]
+        lines.append(f"  ┌{'─' * pad}┐")
+        lines.append(f"  │  {label:<{pad-2}}│")
+        lines.append(f"  └{'─' * pad}┘")
         if i < len(components) - 1:
-            lines.append(f"              │")
-            lines.append(f"              ▼")
+            lines.append(f"       │")
+            lines.append(f"       ▼")
     return "\n".join(lines)
+
+
+def extract_components(task_desc: str) -> tuple[list[str], str]:
+    desc = task_desc.lower()
+    if any(w in desc for w in ["scraper", "scrape", "hacker news", "crawl", "fetch"]):
+        return ([
+            "HTTP GET Request",
+            "HTML Response Parser",
+            "Title & Score Extractor",
+            "Topic Classifier",
+            "Results [ ]",
+            "Output / Storage",
+        ], "Web Scraper Architecture")
+    if any(w in desc for w in ["agent", "coalition", "speciali", "society"]):
+        return ([
+            "Task Posted",
+            "Auction Engine",
+            "Coalition Formation",
+            "Specialist Agents",
+            "Output Aggregator",
+            "Artifact Store",
+        ], "Agent Society Flow")
+    if any(w in desc for w in ["memory", "episodic", "distill", "rag"]):
+        return ([
+            "Task + Solution",
+            "EpisodicMemory (FAISS)",
+            "KnowledgeDistiller",
+            "Semantic Graph",
+            "RAG Retrieval",
+            "Context Injection",
+        ], "Memory Pipeline")
+    if any(w in desc for w in ["train", "model", "neural", "transform"]):
+        return ([
+            "Input Tokens",
+            "Embedding Layer",
+            "Transformer Blocks",
+            "Output Projection",
+            "Loss Computation",
+            "Gradient Update",
+        ], "Training Pipeline")
+    words = [w.capitalize() for w in task_desc.split() if len(w) > 4][:6]
+    return (words or ["Input", "Process", "Output"], "Data Flow")
  
  
 def make_bar_chart(data: dict[str, float], title: str = "Chart") -> str:
@@ -129,16 +175,8 @@ VISUAL_TEMPLATES = {
         ),
         "style_vector": [0.8, 0.1, 0.1, 0.9, 0.2],
         "generator": lambda ctx: make_data_flow_diagram(
-            ctx.get("components", [
-                "HTTP Request",
-                "scrape_hackernews(url)",
-                "BeautifulSoup Parser",
-                "Title Extractor",
-                "results list",
-                "Topic Classifier",
-                "Bar Chart Output",
-            ]),
-            title=ctx.get("title", "Scraper Data Flow")
+            ctx.get("components") or extract_components(ctx.get("task_desc", ctx.get("title","")))[0],
+            title=ctx.get("title") or extract_components(ctx.get("task_desc", ctx.get("title","")))[1]
         ),
     },
  
@@ -249,13 +287,18 @@ class CLIPScorer:
         prompt_words  = set(re.findall(r'\w+', prompt.lower())) \
                         - self.STOP_WORDS
         content_words = set(re.findall(r'\w+', content.lower()))
- 
         if not prompt_words:
             return 0.5
- 
         overlap = prompt_words & content_words
         raw     = len(overlap) / len(prompt_words)
-        return round(max(0.3, min(1.0, raw + 0.3)), 3)
+        structure_bonus = 0.0
+        if '┌' in content and '└' in content:
+            structure_bonus += 0.15
+        if '▼' in content or '│' in content:
+            structure_bonus += 0.10
+        if content.count('┌') >= 3:
+            structure_bonus += 0.10
+        return round(max(0.3, min(1.0, raw + 0.3 + structure_bonus)), 3)
 
 class VisualOutputLayer:
     def __init__(self, mode: str = "ascii"):
@@ -283,7 +326,8 @@ class VisualOutputLayer:
                 difficulty    : float = 0.5) -> VisualArtifact:
         key      = template_key or self.select_template(task_desc)
         template = VISUAL_TEMPLATES.get(key, VISUAL_TEMPLATES["data_flow"])
-        ctx      = context or {}
+        ctx      = dict(context or {})
+        ctx.setdefault("task_desc", task_desc)
 
         prompt       = template["prompt"]
         style_vector = template["style_vector"]
@@ -291,15 +335,7 @@ class VisualOutputLayer:
         if self.mode == "sdxl":
             content = self._generate_sdxl(prompt)
         elif self.mode == "ascii":
-            try:
-                from output.llm_backend import generate_visual, available
-                if available():
-                    llm_vis = generate_visual(task_desc, max_tokens=200, difficulty=difficulty)
-                    content = llm_vis if llm_vis and len(llm_vis) > 10 else template["generator"](ctx)
-                else:
-                    content = template["generator"](ctx)
-            except Exception:
-                content = template["generator"](ctx)
+            content = template["generator"](ctx)
         else:
             content = (
                 f"[VISUAL STUB]\n"
@@ -309,7 +345,7 @@ class VisualOutputLayer:
             )
 
         import random
-        base_quality = self.scorer.score(prompt, content)
+        base_quality = self.scorer.score(task_desc, content)
         if difficulty < 0.4:
             quality = base_quality * random.uniform(0.4, 0.65)
         elif difficulty < 0.75:
