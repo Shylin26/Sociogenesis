@@ -55,9 +55,7 @@ def _make_fingerprints(type_seeds, n_agents=N_AGENTS, seed=7):
     gen.manual_seed(seed)
     fps = {}
     for i in range(n_agents):
-        base = (type_seeds["code"]     if i % 3 == 0 else
-                type_seeds["research"] if i % 3 == 1 else
-                type_seeds["visual"])
+        base = F.normalize(torch.randn(128, generator=gen), dim=0)
         fps[i] = F.normalize(base + torch.randn(128, generator=gen) * 0.1, dim=0)
     return fps
 

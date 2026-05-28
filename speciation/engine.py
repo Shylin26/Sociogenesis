@@ -75,11 +75,10 @@ class SpeciationEngine:
                     f"Seeds {names[i]}/{names[j]} too similar: {sim:.3f}"
 
         self.records: dict[int, AgentTaskRecord] = {}
+        center = F.normalize(sum(self._type_seeds.values()), dim=0)
         for i in range(n_agents):
-            init_type = names[i % len(names)]
-            seed_fp   = self._type_seeds[init_type]
-            noise     = torch.randn(fp_dim, generator=gen) * 0.3
-            fp        = F.normalize(seed_fp + noise, dim=0)
+            noise = torch.randn(fp_dim, generator=gen) * 0.01
+            fp    = F.normalize(center + noise, dim=0)
             self.records[i] = AgentTaskRecord(agent_id=i, fingerprint=fp)
 
         self.encoder = TaskEncoder()
