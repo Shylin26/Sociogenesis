@@ -29,7 +29,7 @@ from core.benchmark       import TASK_BANK
 
 DEMO_SEED    = 42
 N_AGENTS     = 20
-WARMUP_TICKS = 200
+WARMUP_TICKS = 500
 DEMO_TIMEOUT = 60
 TASK_TYPES   = ["code", "research", "visual"]
 COALITION_THRESHOLD = 0.75
@@ -106,7 +106,7 @@ def build_society():
     balances        = {i: 100 for i in range(N_AGENTS)}
     reputations     = {i: 0.0  for i in range(N_AGENTS)}
 
-    engine        = SpeciationEngine(n_agents=N_AGENTS, alpha_scale=0.15,
+    engine        = SpeciationEngine(n_agents=N_AGENTS, alpha_scale=0.25,
                                      top_n=3, seed=DEMO_SEED)
     evo_engine    = EvolutionEngine(engine=engine, registry=None,
                                     evolution_interval=100, mutation_rate=0.10)
