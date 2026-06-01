@@ -273,6 +273,20 @@ def warmup(s):
             for e in evo.events:
                 print(f"  [EVOLUTION] Agent {e.dead_id} → parent Agent {e.parent_id}")
 
+        if tick % 20 == 0:
+            roles = {}
+            for aid, rec in s['engine'].records.items():
+                fp   = rec.fingerprint
+                best = max(s['engine']._type_seeds.items(),
+                           key=lambda kv: float(fp @ kv[1]))
+                roles.setdefault(best[0], []).append(aid)
+            role_counts = {r: len(v) for r, v in roles.items()}
+            total = sum(role_counts.values())
+            for role, agents_in_role in roles.items():
+                if role_counts[role] < total // 4:
+                    for aid in agents_in_role:
+                        s['balances'][aid] = s['balances'].get(aid, 0) + 5
+
         s['historian'].on_tick(tick)
         s['librarian'].on_tick(tick)
 

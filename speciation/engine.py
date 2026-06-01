@@ -108,9 +108,14 @@ class SpeciationEngine:
 
             attractor = self._attractors[task_type]
             alpha     = max(0.01, min(0.4, self.alpha_scale * reward))
+            total_ticks = max(1, tick)
+            temperature = max(0.05, 1.0 - (total_ticks / 2000.0))
 
             fp   = rec.fingerprint
             fp   = fp + alpha * (attractor - fp)
+            if temperature > 0.1:
+                exploration = torch.randn(self.fp_dim) * temperature * 0.2
+                fp = fp + exploration
             norm = fp.norm()
             fp   = fp / norm if norm > 1e-8 else \
                    F.normalize(torch.randn(self.fp_dim), dim=0)
@@ -120,6 +125,14 @@ class SpeciationEngine:
             self.total_updates += 1
             return fp
 
+        else:
+            total_ticks = max(1, tick)
+            temperature = max(0.05, 1.0 - (total_ticks / 2000.0))
+            if temperature > 0.15:
+                exploration = torch.randn(self.fp_dim) * temperature * 0.15
+                fp   = rec.fingerprint + exploration
+                norm = fp.norm()
+                rec.fingerprint = fp / norm if norm > 1e-8 else rec.fingerprint
         return None
 
     def _recompute_attractor(self, task_type: str):
